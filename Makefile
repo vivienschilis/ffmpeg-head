@@ -1,4 +1,7 @@
 #PATH VARIABLES
+UNAME := $(shell uname -s)
+
+
 
 PREFIX_DIR=${PWD}
 CONFIGURE_AND_PREFIX=./configure --prefix=${OLIBS_DIR} 
@@ -30,11 +33,19 @@ OGG_CODEC=libogg-1.2.0
 VORBIS_CODEC_URL=http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.1.tar.gz
 VORBIS_CODEC=libvorbis-1.3.1
 
-XVID_CODEC_URL=http://downloads.xvid.org/downloads/xvidcore-1.2.2.tar.gz
-XVID_CODEC=xvidcore/build/generic
+
+ifeq ($(UNAME), Darwin)
+	XVID_CODEC_URL=http://downloads.xvid.org/downloads/xvidcore-1.1.3.tar.gz
+	XVID_CODEC=xvidcore-1.1.3/build/generic
+	XVID_CONFIGURE_ARGS = --disable-assembly --disable-mmx
+else
+	XVID_CODEC_URL=http://downloads.xvid.org/downloads/xvidcore-1.2.2.tar.gz
+	XVID_CODEC=xvidcore/build/generic	
+endif
 
 AMR_CODEC_URL=http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/0.1.2/opencore-amr-0.1.2.tar.gz
 AMR_CODEC=opencore-amr-0.1.2
+
 
 TARGZ_SOURCES = ${GSM_CODEC_URL} ${FAAC_CODEC_URL} ${FAAD2_CODEC_URL} ${LAME_CODEC_URL} ${OGG_CODEC_URL} ${VORBIS_CODEC_URL} ${XVID_CODEC_URL} ${AMR_CODEC_URL}
 
@@ -57,7 +68,7 @@ GIT_SOURCES = ${VPX_CODEC_URL} ${X264_CODEC_URL}
 FFMPEG_TOOL=ffmpeg
 FFMPEG_TOOL_URL="svn://svn.ffmpeg.org/ffmpeg/trunk ffmpeg"
 
-SVN_SOURCES = ${FFMPEG_TOOL_URL}
+TOOLS_SVN_SOURCES = ${FFMPEG_TOOL_URL}
 
 ENABLE_FFMPEG_CODECS += --enable-postproc
 ENABLE_FFMPEG_CODECS += --enable-nonfree
@@ -79,9 +90,9 @@ DISABLE_FFMPEG_TOOLS += --disable-ffplay
 DISABLE_FFMPEG_TOOLS += --disable-ffserver 
 DISABLE_FFMPEG_TOOLS += --disable-ffprobe
 
-FFMPEG_CFLAGS += -I/root/builds/ffmpeg/olibs/include 
+FFMPEG_CFLAGS += -I${OLIBS_DIR}/include
 FFMPEG_CFLAGS += --static 
-FFMPEG_LDFLAGS += -L ${OLIBS_DIR}/lib
+FFMPEG_LDFLAGS += -L${OLIBS_DIR}/lib
 
 CONFIGURE_FFMPEG= ${CONFIGURE_STATIC} ${ENABLE_FFMPEG_CODECS} ${DISABLE_FFMPEG_TOOLS} --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --prefix=${DIST_DIR}
 
@@ -89,7 +100,19 @@ ALL_LIBS = ${FAAC_CODEC} ${GSM_CODEC} ${LAME_CODEC} ${OGG_CODEC} ${THEORA_CODEC}
 
 ALL_TOOLS = ${FFMPEG_TOOL}
 
-all: init faac gsm lame ogg theora vorbis vpx amr x264 xvid ffmpeg
+all: init faac gsm lame ogg theora vorbis vpx amr x264 xvid ffmpeg message
+
+message:
+	@echo
+	@echo "---------------------------------------------------------------"
+	@echo " FFMPEG has been successfully built."
+	@echo
+	@echo " * Binaries are currently located in the '$(DIST_DIR/bin)' directory"
+	@echo " * To install them on your system, you can run '# make install'"
+	@echo "   as root."
+	@echo "---------------------------------------------------------------"
+	@echo
+
 
 init: 
 	mkdir -p ${TOOLS_DIR}
@@ -130,7 +153,7 @@ x264:
 	cd ${LIB_DIR}/${X264_CODEC} && ${CONFIGURE_STATIC} && make && make install
 
 xvid: 
-	cd ${LIB_DIR}/${XVID_CODEC} && ${CONFIGURE_STATIC} && make && make install
+	cd ${LIB_DIR}/${XVID_CODEC} && ${CONFIGURE_STATIC} ${XVID_CONFIGURE_ARGS} && make && make install
 
 ffmpeg: 
 	cd ${TOOLS_DIR}/${FFMPEG_TOOL} && ${CONFIGURE_FFMPEG} && make && make install
@@ -140,8 +163,8 @@ ffmpeg:
 
 # DOWNLOAD METHODS
 download_archive = cd ${ARCH_DIR} && wget $(1)
-clone_from_git = cd ${LIB_DIR} && git clone $(1)
-clone_from_svn = cd ${LIB_DIR} && svn checkout $(1)
+clone_from_git = git clone $(1)
+clone_from_svn = svn checkout $(1)
 
 
 bootstrap: init_bootstrap clean_archives download_sources
@@ -160,13 +183,16 @@ download_sources:
 	@cd ${ARCH_DIR} && for file in `ls *.tar.gz`; do  cd ${LIB_DIR} && tar -zxvf ${ARCH_DIR}/$$file; done
 	for i in ${TARBZ2_SOURCES}; do $(call download_archive,$$i); done	
 	@cd ${ARCH_DIR} && for file in `ls *.tar.bz2`; do  cd ${LIB_DIR} && tar -xjvf ${ARCH_DIR}/$$file; done
-	for i in ${GIT_SOURCES}; do $(call clone_from_git,$$i); done
-	for i in ${SVN_SOURCES}; do $(call clone_from_svn,$$i); done
+	for i in ${GIT_SOURCES}; do cd ${LIB_DIR} && $(call clone_from_git,$$i); done
 	echo "Downloads done."
+
+download_tools:
+	for i in ${TOOLS_SVN_SOURCES}; do cd ${TOOLS_DIR} && $(call clone_from_svn,$$i); done
 
 clean:
 	for i in ${ALL_LIBS}; do cd ${LIB_DIR}/$$i && make clean; done
 	for i in ${ALL_TOOLS}; do cd ${TOOLS_DIR}/$$i && make clean; done
 	rm -rf ${PREFIX_DIR}/olibs/*
-	
+
 test:
+	echo ${UNAME}
