@@ -113,13 +113,12 @@ message:
 	@echo "---------------------------------------------------------------"
 	@echo
 
-
 # helper methods
 print_done = \
 	echo && echo ${TTY_GREEN}\* ${TTY_WHITE}Done. ${TTY_RESET}
 
 start_compiling_message= \
-	echo && echo ${TTY_BLUE}==\> ${TTY_WHITE}Start compiling $(1)... ${TTY_RESET}
+	echo && echo ${TTY_BLUE}==\> ${TTY_WHITE}Compiling $(1)... ${TTY_RESET}
 
 end_compiling_message= \
 	echo && echo ${TTY_GREEN}* ${TTY_WHITE}$(1) has been compiled with success. ${TTY_RESET}
@@ -127,7 +126,7 @@ end_compiling_message= \
 m_and_mi = make && make install
 
 init: 
-	@echo ${TTY_BLUE}==\>${TTY_WHITE} Creating directoring... ${TTY_RESET}
+	@echo ${TTY_BLUE}==\> ${TTY_WHITE}Creating directories... ${TTY_RESET}
 	mkdir -p ${TOOLS_DIR}
 	mkdir -p ${OLIBS_DIR}
 	mkdir -p ${DIST_DIR}
@@ -150,7 +149,6 @@ gsm:
 	@cd ${LIB_DIR}/${GSM_CODEC} && cp inc/gsm.h ${OLIBS_DIR}/include/gsm/
 	@$(call end_compiling_message, gsm)
 	
-
 lame: 
 	@$(call start_compiling_message, lame)
 	@cd ${LIB_DIR}/${LAME_CODEC} && ${CONFIGURE_STATIC} && $(call m_and_mi)
@@ -161,7 +159,6 @@ ogg:
 	@cd ${LIB_DIR}/${OGG_CODEC} && ${CONFIGURE_STATIC} && $(call m_and_mi)
 	@$(call end_compiling_message, ogg)
 	
-
 theora: 
 	@$(call start_compiling_message, theora)
 	@cd ${LIB_DIR}/${THEORA_CODEC} && ${CONFIGURE_STATIC} && $(call m_and_mi)
@@ -179,7 +176,6 @@ vpx:
 	@cd ${LIB_DIR}/${VPX_CODEC} && ${CONFIGURE_AND_PREFIX} && $(call m_and_mi)
 	@$(call end_compiling_message, vpx)
 	
-
 amr: 
 	@$(call start_compiling_message, amr)
 	@cd ${LIB_DIR}/${AMR_CODEC} && ${CONFIGURE_STATIC} && $(call m_and_mi)
@@ -224,6 +220,7 @@ clean_archives:
 
 download_sources:
 	@echo ${TTY_BLUE}==\>${TTY_WHITE} Start downloading sources... ${TTY_RESET}
+	
 	@for i in ${TARGZ_SOURCES}; do $(call download_archive,$$i) && $(call print_done); done
 	@for i in ${TARBZ2_SOURCES}; do $(call download_archive,$$i) && $(call print_done); done	
 	@for i in ${GIT_SOURCES}; do cd ${LIB_DIR} && $(call clone_from_git,$$i) && $(call print_done); done
