@@ -1,7 +1,10 @@
 #PATH VARIABLES
 UNAME := $(shell uname -s)
 
-
+TTY_WHITE=\\033[1\;39m
+TTY_BLUE=\\033[1\;34m
+TTY_GREEN=\\033[1\;32m
+TTY_RESET=\\033[0m
 
 PREFIX_DIR=${PWD}
 CONFIGURE_AND_PREFIX=./configure --prefix=${OLIBS_DIR} 
@@ -33,7 +36,6 @@ OGG_CODEC=libogg-1.2.0
 VORBIS_CODEC_URL=http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.1.tar.gz
 VORBIS_CODEC=libvorbis-1.3.1
 
-
 ifeq ($(UNAME), Darwin)
 	XVID_CODEC_URL=http://downloads.xvid.org/downloads/xvidcore-1.1.3.tar.gz
 	XVID_CODEC=xvidcore-1.1.3/build/generic
@@ -45,7 +47,6 @@ endif
 
 AMR_CODEC_URL=http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/0.1.2/opencore-amr-0.1.2.tar.gz
 AMR_CODEC=opencore-amr-0.1.2
-
 
 TARGZ_SOURCES = ${GSM_CODEC_URL} ${FAAC_CODEC_URL} ${FAAD2_CODEC_URL} ${LAME_CODEC_URL} ${OGG_CODEC_URL} ${VORBIS_CODEC_URL} ${XVID_CODEC_URL} ${AMR_CODEC_URL}
 
@@ -107,14 +108,26 @@ message:
 	@echo "---------------------------------------------------------------"
 	@echo " FFMPEG has been successfully built."
 	@echo
-	@echo " * Binaries are currently located in the '$(DIST_DIR/bin)' directory"
-	@echo " * To install them on your system, you can run '# make install'"
-	@echo "   as root."
+	@echo " * Binaries are currently located in the '$(DIST_DIR)/bin' directory"
+	@echo " * To install them on your system, you can run 'make install'"
 	@echo "---------------------------------------------------------------"
 	@echo
 
 
+# helper methods
+print_done = \
+	echo ${TTY_GREEN}*${TTY_WHITE} Done.${TTY_RESET} && echo
+
+start_compiling_message= \
+	echo ${TTY_BLUE}==\>${TTY_WHITE} Start compiling $(1)... ${TTY_RESET} && echo
+
+end_compiling_message= \
+	echo ${TTY_GREEN}* ${TTY_WHITE} $(1) has been compiled with success. ${TTY_RESET} && echo
+
+m_and_mi = make && make install
+
 init: 
+	@echo ${TTY_BLUE}==\>${TTY_WHITE} Creating directoring... ${TTY_RESET}
 	mkdir -p ${TOOLS_DIR}
 	mkdir -p ${OLIBS_DIR}
 	mkdir -p ${DIST_DIR}
@@ -123,41 +136,72 @@ init:
 	mkdir -p ${OLIBS_DIR}/lib
 	mkdir -p ${OLIBS_DIR}/man
 	mkdir -p ${OLIBS_DIR}/man/man3
+	@$(call print_done)
+
 faac: 
-	cd ${LIB_DIR}/${FAAC_CODEC} && ${CONFIGURE_STATIC} && make && make install
+	@$(call start_compiling_message, faac)
+	@cd ${LIB_DIR}/${FAAC_CODEC} && ${CONFIGURE_STATIC} && $(call m_and_mi)
+	@$(call end_compiling_message, faac)
 
 gsm: 
-	cd ${LIB_DIR}/${GSM_CODEC} && make
-	cd ${LIB_DIR}/${GSM_CODEC} && cp lib/* ${OLIBS_DIR}/lib
-	cd ${LIB_DIR}/${GSM_CODEC} && cp inc/gsm.h ${OLIBS_DIR}/include/gsm/
+	@$(call start_compiling_message, gsm)
+	@cd ${LIB_DIR}/${GSM_CODEC} && make
+	@cd ${LIB_DIR}/${GSM_CODEC} && cp lib/* ${OLIBS_DIR}/lib
+	@cd ${LIB_DIR}/${GSM_CODEC} && cp inc/gsm.h ${OLIBS_DIR}/include/gsm/
+	@$(call end_compiling_message, gsm)
+	
 
 lame: 
-	cd ${LIB_DIR}/${LAME_CODEC} && ${CONFIGURE_STATIC} && make && make install
-
+	@$(call start_compiling_message, lame)
+	@cd ${LIB_DIR}/${LAME_CODEC} && ${CONFIGURE_STATIC} && $(call m_and_mi)
+	@$(call end_compiling_message, lame)
+	
 ogg: 
-	cd ${LIB_DIR}/${OGG_CODEC} && ${CONFIGURE_STATIC} && make && make install
+	@$(call start_compiling_message, ogg)
+	@cd ${LIB_DIR}/${OGG_CODEC} && ${CONFIGURE_STATIC} && $(call m_and_mi)
+	@$(call end_compiling_message, ogg)
+	
 
 theora: 
-	cd ${LIB_DIR}/${THEORA_CODEC} && ${CONFIGURE_STATIC} && make && make install
+	@$(call start_compiling_message, theora)
+	@cd ${LIB_DIR}/${THEORA_CODEC} && ${CONFIGURE_STATIC} && $(call m_and_mi)
+	@$(call end_compiling_message, theora)
+	
 
 vorbis: 
-	cd ${LIB_DIR}/${VORBIS_CODEC} && ${CONFIGURE_STATIC} && make && make install
+	@$(call start_compiling_message, vorbis)
+	@cd ${LIB_DIR}/${VORBIS_CODEC} && ${CONFIGURE_STATIC} && $(call m_and_mi)
+	@$(call end_compiling_message, vorbis)
+	
 
 vpx: 
-	cd ${LIB_DIR}/${VPX_CODEC} && ${CONFIGURE_AND_PREFIX} && make && make install
+	@$(call start_compiling_message, vpx)
+	@cd ${LIB_DIR}/${VPX_CODEC} && ${CONFIGURE_AND_PREFIX} && $(call m_and_mi)
+	@$(call end_compiling_message, vpx)
+	
 
 amr: 
-	cd ${LIB_DIR}/${AMR_CODEC} && ${CONFIGURE_STATIC} && make && make install
+	@$(call start_compiling_message, amr)
+	@cd ${LIB_DIR}/${AMR_CODEC} && ${CONFIGURE_STATIC} && $(call m_and_mi)
+	@$(call end_compiling_message, amr)
+	
 
 x264: 
-	cd ${LIB_DIR}/${X264_CODEC} && ${CONFIGURE_STATIC} && make && make install
-
+	@$(call start_compiling_message, x264)
+	@cd ${LIB_DIR}/${X264_CODEC} && ${CONFIGURE_STATIC} && $(call m_and_mi)
+	@$(call end_compiling_message, x264)
+	
 xvid: 
-	cd ${LIB_DIR}/${XVID_CODEC} && ${CONFIGURE_STATIC} ${XVID_CONFIGURE_ARGS} && make && make install
+	@$(call start_compiling_message, xvid)
+	@cd ${LIB_DIR}/${XVID_CODEC} && ${CONFIGURE_STATIC} ${XVID_CONFIGURE_ARGS} && $(call m_and_mi)
+	@$(call end_compiling_message, xvid)
+	
 
 ffmpeg: 
-	cd ${TOOLS_DIR}/${FFMPEG_TOOL} && ${CONFIGURE_FFMPEG} && make && make install
-
+	@$(call start_compiling_message, ffmpeg)
+	@cd ${TOOLS_DIR}/${FFMPEG_TOOL} && ${CONFIGURE_FFMPEG} && $(call m_and_mi)
+	@$(call end_compiling_message, ffmpeg)
+	
 
 # BOOTSTRAP A NEW FFMPEG BUILD FROM SCRATCH
 
@@ -166,33 +210,39 @@ download_archive = cd ${ARCH_DIR} && wget $(1)
 clone_from_git = git clone $(1)
 clone_from_svn = svn checkout $(1)
 
-
 bootstrap: init_bootstrap clean_archives download_sources
-	@echo "Done."
 
 init_bootstrap:
 	@mkdir -p ${ARCH_DIR}
 	@mkdir -p ${LIB_DIR}
 
 clean_archives:
+	@echo ${TTY_BLUE}==\>${TTY_WHITE} Removing all download sources ${TTY_RESET}
 	rm -rf ${PREFIX_DIR}/archives/*
 	rm -rf ${PREFIX_DIR}/libraries/*
+	@$(call print_done)
 
-download_sources: 
-	for i in ${TARGZ_SOURCES}; do $(call download_archive,$$i); done
-	@cd ${ARCH_DIR} && for file in `ls *.tar.gz`; do  cd ${LIB_DIR} && tar -zxvf ${ARCH_DIR}/$$file; done
-	for i in ${TARBZ2_SOURCES}; do $(call download_archive,$$i); done	
-	@cd ${ARCH_DIR} && for file in `ls *.tar.bz2`; do  cd ${LIB_DIR} && tar -xjvf ${ARCH_DIR}/$$file; done
-	for i in ${GIT_SOURCES}; do cd ${LIB_DIR} && $(call clone_from_git,$$i); done
-	echo "Downloads done."
+download_sources:
+	@echo ${TTY_BLUE}==\>${TTY_WHITE} Start downloading sources... ${TTY_RESET}
+	@for i in ${TARGZ_SOURCES}; do $(call download_archive,$$i) && $(call print_done); done
+	@for i in ${TARBZ2_SOURCES}; do $(call download_archive,$$i) && $(call print_done); done	
+	@for i in ${GIT_SOURCES}; do cd ${LIB_DIR} && $(call clone_from_git,$$i) && $(call print_done); done
+	
+	@echo ${TTY_BLUE}==\>${TTY_WHITE} Start unarchiving sources... ${TTY_RESET}
+	@cd ${ARCH_DIR} && for file in `ls *.tar.gz`; do  cd ${LIB_DIR} && tar -zxvf ${ARCH_DIR}/$$file && $(call print_done); done
+	@cd ${ARCH_DIR} && for file in `ls *.tar.bz2`; do  cd ${LIB_DIR} && tar -xjvf ${ARCH_DIR}/$$file && $(call print_done); done
+	
+	@echo ${TTY_GREEN}*${TTY_WHITE} All sources are ready to be compiled.${TTY_RESET}
 
 download_tools:
-	for i in ${TOOLS_SVN_SOURCES}; do cd ${TOOLS_DIR} && $(call clone_from_svn,$$i); done
+	@echo ${TTY_BLUE}==\>${TTY_WHITE} Start downloading tools... ${TTY_RESET}
+	@for i in ${TOOLS_SVN_SOURCES}; do cd ${TOOLS_DIR} && $(call clone_from_svn,$$i) && $(call print_done); done
+	@echo ${TTY_GREEN}*${TTY_WHITE} All tools are ready to be compiled.${TTY_RESET}
+	@$(call print_done)
 
 clean:
-	for i in ${ALL_LIBS}; do cd ${LIB_DIR}/$$i && make clean; done
-	for i in ${ALL_TOOLS}; do cd ${TOOLS_DIR}/$$i && make clean; done
-	rm -rf ${PREFIX_DIR}/olibs/*
-
-test:
-	echo ${UNAME}
+	@echo ${TTY_BLUE}==\>${TTY_WHITE} Cleaning compiled directories ${TTY_RESET}
+	@for i in ${ALL_LIBS}; do cd ${LIB_DIR}/$$i && make clean; done
+	@for i in ${ALL_TOOLS}; do cd ${TOOLS_DIR}/$$i && make clean; done
+	@rm -rf ${PREFIX_DIR}/olibs/*
+	@$(call print_done)
