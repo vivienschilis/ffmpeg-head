@@ -1,23 +1,63 @@
-PREFIX_DIR=/root/builds/ffmpegdev
+#PATH VARIABLES
+
+PREFIX_DIR=${PWD}
 CONFIGURE_AND_PREFIX=./configure --prefix=${OLIBS_DIR} 
 CONFIGURE_STATIC = ${CONFIGURE_AND_PREFIX} --enable-static --disable-shared
 LIB_DIR=${PREFIX_DIR}/libraries
 TOOLS_DIR=${PREFIX_DIR}/tools
 OLIBS_DIR=${PREFIX_DIR}/olibs
 DIST_DIR=${PREFIX_DIR}/dist
+ARCH_DIR=${PREFIX_DIR}/archives
 
-FAAC_CODEC=faac-1.28
+# URL TO DOWNLOAD ALL CODECS ARCHIVES
+
+# TARGZ URL
+GSM_CODEC_URL=http://www.finalmediaplayer.com/downloads/3rdparty/libgsm_1.0.13.orig.tar.gz
 GSM_CODEC=gsm-1.0-pl13
+
+FAAC_CODEC_URL=http://downloads.sourceforge.net/faac/faac-1.28.tar.gz
+FAAC_CODEC=faac-1.28
+
+FAAD2_CODEC_URL=http://downloads.sourceforge.net/faac/faad2-2.7.tar.gz
+FAAD2_CODEC=faad2-2.7
+
+LAME_CODEC_URL=http://downloads.sourceforge.net/project/lame/lame/3.98.4/lame-3.98.4.tar.gz
 LAME_CODEC=lame-3.98.4
+
+OGG_CODEC_URL=http://downloads.xiph.org/releases/ogg/libogg-1.2.0.tar.gz
 OGG_CODEC=libogg-1.2.0
-THEORA_CODEC=libtheora-1.1.1
+
+VORBIS_CODEC_URL=http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.1.tar.gz
 VORBIS_CODEC=libvorbis-1.3.1
-VPX_CODEC=libvpx
-AMR_CODEC=opencore-amr-0.1.2
-X264_CODEC=x264
+
+XVID_CODEC_URL=http://downloads.xvid.org/downloads/xvidcore-1.2.2.tar.gz
 XVID_CODEC=xvidcore/build/generic
 
+AMR_CODEC_URL=http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/0.1.2/opencore-amr-0.1.2.tar.gz
+AMR_CODEC=opencore-amr-0.1.2
+
+TARGZ_SOURCES = ${GSM_CODEC_URL} ${FAAC_CODEC_URL} ${FAAD2_CODEC_URL} ${LAME_CODEC_URL} ${OGG_CODEC_URL} ${VORBIS_CODEC_URL} ${XVID_CODEC_URL} ${AMR_CODEC_URL}
+
+# TARBZ2 URL
+THEORA_CODEC_URL=http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2
+THEORA_CODEC=libtheora-1.1.1
+
+TARBZ2_SOURCES = ${THEORA_CODEC_URL}
+
+## GIT
+VPX_CODEC_URL=git://review.webmproject.org/libvpx.git
+VPX_CODEC=libvpx
+
+X264_CODEC_URL=git://git.videolan.org/x264.git
+X264_CODEC=x264
+
+GIT_SOURCES = ${VPX_CODEC_URL} ${X264_CODEC_URL}
+
+# TOOLS
 FFMPEG_TOOL=ffmpeg
+FFMPEG_TOOL_URL="svn://svn.ffmpeg.org/ffmpeg/trunk ffmpeg"
+
+SVN_SOURCES = ${FFMPEG_TOOL_URL}
 
 ENABLE_FFMPEG_CODECS += --enable-postproc
 ENABLE_FFMPEG_CODECS += --enable-nonfree
@@ -52,7 +92,6 @@ ALL_TOOLS = ${FFMPEG_TOOL}
 all: init faac gsm lame ogg theora vorbis vpx amr x264 xvid ffmpeg
 
 init: 
-	mkdir -p ${LIB_DIR}
 	mkdir -p ${TOOLS_DIR}
 	mkdir -p ${OLIBS_DIR}
 	mkdir -p ${DIST_DIR}
@@ -96,7 +135,38 @@ xvid:
 ffmpeg: 
 	cd ${TOOLS_DIR}/${FFMPEG_TOOL} && ${CONFIGURE_FFMPEG} && make && make install
 
+
+# BOOTSTRAP A NEW FFMPEG BUILD FROM SCRATCH
+
+# DOWNLOAD METHODS
+download_archive = cd ${ARCH_DIR} && wget $(1)
+clone_from_git = cd ${LIB_DIR} && git clone $(1)
+clone_from_svn = cd ${LIB_DIR} && svn checkout $(1)
+
+
+bootstrap: init_bootstrap clean_archives download_sources
+	@echo "Done."
+
+init_bootstrap:
+	@mkdir -p ${ARCH_DIR}
+	@mkdir -p ${LIB_DIR}
+
+clean_archives:
+	rm -rf ${PREFIX_DIR}/archives/*
+	rm -rf ${PREFIX_DIR}/libraries/*
+
+download_sources: 
+	for i in ${TARGZ_SOURCES}; do $(call download_archive,$$i); done
+	@cd ${ARCH_DIR} && for file in `ls *.tar.gz`; do  cd ${LIB_DIR} && tar -zxvf ${ARCH_DIR}/$$file; done
+	for i in ${TARBZ2_SOURCES}; do $(call download_archive,$$i); done	
+	@cd ${ARCH_DIR} && for file in `ls *.tar.bz2`; do  cd ${LIB_DIR} && tar -xjvf ${ARCH_DIR}/$$file; done
+	for i in ${GIT_SOURCES}; do $(call clone_from_git,$$i); done
+	for i in ${SVN_SOURCES}; do $(call clone_from_svn,$$i); done
+	echo "Downloads done."
+
 clean:
 	for i in ${ALL_LIBS}; do cd ${LIB_DIR}/$$i && make clean; done
 	for i in ${ALL_TOOLS}; do cd ${TOOLS_DIR}/$$i && make clean; done
-	rm -rf ${PREFIX_DIR}/olibs
+	rm -rf ${PREFIX_DIR}/olibs/*
+	
+test:
