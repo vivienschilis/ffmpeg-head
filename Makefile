@@ -116,13 +116,13 @@ message:
 
 # helper methods
 print_done = \
-	echo ${TTY_GREEN}*${TTY_WHITE} Done.${TTY_RESET} && echo
+	echo && echo ${TTY_GREEN}\* ${TTY_WHITE}Done. ${TTY_RESET}
 
 start_compiling_message= \
-	echo ${TTY_BLUE}==\>${TTY_WHITE} Start compiling $(1)... ${TTY_RESET} && echo
+	echo && echo ${TTY_BLUE}==\> ${TTY_WHITE}Start compiling $(1)... ${TTY_RESET}
 
 end_compiling_message= \
-	echo ${TTY_GREEN}* ${TTY_WHITE} $(1) has been compiled with success. ${TTY_RESET} && echo
+	echo && echo ${TTY_GREEN}* ${TTY_WHITE}$(1) has been compiled with success. ${TTY_RESET}
 
 m_and_mi = make && make install
 
