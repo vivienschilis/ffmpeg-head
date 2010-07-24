@@ -71,32 +71,32 @@ FFMPEG_TOOL_URL="svn://svn.ffmpeg.org/ffmpeg/trunk ffmpeg"
 
 TOOLS_SVN_SOURCES = ${FFMPEG_TOOL_URL}
 
-ENABLE_FFMPEG_CODECS += --enable-postproc
-ENABLE_FFMPEG_CODECS += --enable-nonfree
-ENABLE_FFMPEG_CODECS += --enable-libx264 
-ENABLE_FFMPEG_CODECS += --enable-gpl
-ENABLE_FFMPEG_CODECS += --enable-libfaac
-ENABLE_FFMPEG_CODECS += --enable-libmp3lame
-ENABLE_FFMPEG_CODECS += --enable-libtheora
-ENABLE_FFMPEG_CODECS += --enable-libxvid
-ENABLE_FFMPEG_CODECS += --enable-libvorbis
-ENABLE_FFMPEG_CODECS += --enable-libgsm
-ENABLE_FFMPEG_CODECS += --enable-libvpx
-ENABLE_FFMPEG_CODECS += --enable-avfilter
-ENABLE_FFMPEG_CODECS += --enable-avfilter-lavf
-ENABLE_FFMPEG_CODECS += --enable-libopencore-amrnb
-ENABLE_FFMPEG_CODECS += --enable-libopencore-amrwb
-ENABLE_FFMPEG_CODECS += --enable-version3
+ENABLED_FFMPEG_CODECS += --enable-postproc
+ENABLED_FFMPEG_CODECS += --enable-nonfree
+ENABLED_FFMPEG_CODECS += --enable-libx264 
+ENABLED_FFMPEG_CODECS += --enable-gpl
+ENABLED_FFMPEG_CODECS += --enable-libfaac
+ENABLED_FFMPEG_CODECS += --enable-libmp3lame
+ENABLED_FFMPEG_CODECS += --enable-libtheora
+ENABLED_FFMPEG_CODECS += --enable-libxvid
+ENABLED_FFMPEG_CODECS += --enable-libvorbis
+ENABLED_FFMPEG_CODECS += --enable-libgsm
+ENABLED_FFMPEG_CODECS += --enable-libvpx
+ENABLED_FFMPEG_CODECS += --enable-avfilter
+ENABLED_FFMPEG_CODECS += --enable-avfilter-lavf
+ENABLED_FFMPEG_CODECS += --enable-libopencore-amrnb
+ENABLED_FFMPEG_CODECS += --enable-libopencore-amrwb
+ENABLED_FFMPEG_CODECS += --enable-version3
 
-DISABLE_FFMPEG_TOOLS += --disable-ffplay
-DISABLE_FFMPEG_TOOLS += --disable-ffserver 
-DISABLE_FFMPEG_TOOLS += --disable-ffprobe
+DISABLED_FFMPEG_TOOLS += --disable-ffplay
+DISABLED_FFMPEG_TOOLS += --disable-ffserver 
+DISABLED_FFMPEG_TOOLS += --disable-ffprobe
 
 FFMPEG_CFLAGS += -I${OLIBS_DIR}/include
 FFMPEG_CFLAGS += --static 
 FFMPEG_LDFLAGS += -L${OLIBS_DIR}/lib
 
-CONFIGURE_FFMPEG = ${CONFIGURE_STATIC} ${ENABLE_FFMPEG_CODECS} ${DISABLE_FFMPEG_TOOLS} --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --prefix=${DIST_DIR}
+CONFIGURE_FFMPEG = ${CONFIGURE_STATIC} ${ENABLED_FFMPEG_CODECS} ${DISABLED_FFMPEG_TOOLS} --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --prefix=${DIST_DIR}
 
 ALL_LIBS = ${FAAC_CODEC} ${GSM_CODEC} ${LAME_CODEC} ${OGG_CODEC} ${THEORA_CODEC} ${VORBIS_CODEC} ${VPX_CODEC} ${AMR_CODEC} ${X264_CODEC} ${XVID_CODEC}
 
@@ -126,7 +126,6 @@ end_compiling_message= \
 
 prev_configured_message= \
 	echo ${TTY_GREEN}* ${TTY_WHITE}$(1) has been previously configured. ${TTY_RESET}
-
 
 m_and_mi = touch 'configure.done' && if [ ! -f 'compile.done' ]; then \
 	make && make install && touch 'compile.done'; \
@@ -203,7 +202,6 @@ ffmpeg:
 	@cd ${TOOLS_DIR}/${FFMPEG_TOOL} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_FFMPEG}; else $(call prev_configured_message,ffmpeg); fi && $(call m_and_mi,ffmpeg);
 	@$(call end_compiling_message,ffmpeg)
 
-
 # BOOTSTRAP A NEW FFMPEG BUILD ENV FROM SCRATCH
 
 # DOWNLOAD METHODS
@@ -211,7 +209,7 @@ download_archive = cd ${ARCH_DIR} && wget $(1)
 clone_from_git = git clone $(1)
 clone_from_svn = svn checkout $(1)
 
-bootstrap: init_bootstrap cleanall download_sources all
+bootstrap: init_bootstrap cleanall download_sources
 
 init_bootstrap:
 	@mkdir -p ${ARCH_DIR}
