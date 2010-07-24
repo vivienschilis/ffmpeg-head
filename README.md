@@ -1,18 +1,22 @@
-# FFMpeg bootstrap
+# FFMPEG bootstrap
 
 ## What it is.
 
-  It's a tool which allows people to build a static ffmpeg binary.
-  It creates a building environment for ffmpeg
-  It downloads all recent codecs and tools and compile them
-  It reduces the numerous steps to perfoms in a few lines
-  It reduces your time spent to update your old ffmpeg when a new revision is out
+  It's a tool which helps people to build a static ffmpeg binary.
+  
+  It creates a build environment for ffmpeg.
+  
+  It downloads all recent codecs and tools and compile them.
+  
+  It reduces the numerous steps to achieve to an up to date ffmpeg by only using a few commands.
+  
+  It reduces your time spent to update your old ffmpeg when a new revision is out.
 
 ## What it is not. 
 
-  It is not a package manager
-  You need to have previously installed all compiling dependencies
-  They should be pointed out by the autotools of each libraries
+  It is not a package manager.
+  You need to have previously installed all compiling dependencies.
+  They should be pointed out by the autotools of each libraries.
 
 ## How it works. 
 
@@ -54,7 +58,7 @@ Install all binaries
 
     make install
 
-Clean all compiling directories
+Clean all libraries
 
     make clean
   
