@@ -1,4 +1,3 @@
-#PATH VARIABLES
 UNAME := $(shell uname -s)
 
 TTY_WHITE = \\033[1\;39m
@@ -6,7 +5,8 @@ TTY_BLUE = \\033[1\;34m
 TTY_GREEN = \\033[1\;32m
 TTY_RESET = \\033[0m
 
-PREFIX_DIR = ${PWD}
+#PATH VARIABLES
+PREFIX_DIR =$(shell pwd)
 CONFIGURE_AND_PREFIX = ./configure --prefix=${OLIBS_DIR}
 CONFIGURE_STATIC = ${CONFIGURE_AND_PREFIX} --enable-static --disable-shared
 LIB_DIR = ${PREFIX_DIR}/libraries
@@ -109,9 +109,7 @@ message:
 	@echo
 	@echo "---------------------------------------------------------------"
 	@echo " FFMPEG has been successfully built."
-	@echo
-	@echo " * Binaries are currently located in the '$(DIST_DIR)/bin' directory"
-	@echo " * To install them on your system, you can run 'make install'"
+	@echo " To install them on your system, you can run '(sudo) make install'"
 	@echo "---------------------------------------------------------------"
 	@echo
 
@@ -241,6 +239,9 @@ download_sources:
 	
 	@echo ${TTY_GREEN}*${TTY_WHITE} All sources are ready to be compiled.${TTY_RESET}
 
+install:
+	cp ${TOOLS_DIR}/ffmpeg/ffmpeg /usr/bin/ffmpeg
+	
 cleanall:
 	@echo ${TTY_BLUE}==\>${TTY_WHITE} Removing all download sources ${TTY_RESET}
 	rm -rf ${PREFIX_DIR}/archives/*
@@ -253,3 +254,6 @@ clean:
 	@for i in ${ALL_TOOLS}; do cd ${TOOLS_DIR}/$$i && make clean && rm -f 'compile.done' && rm -f 'configure.done'; done
 	@rm -rf ${PREFIX_DIR}/olibs/*
 	@$(call print_done)
+
+test: 
+	@echo ${PREFIX_DIR}
