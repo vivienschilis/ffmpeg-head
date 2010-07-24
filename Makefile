@@ -124,7 +124,15 @@ start_compiling_message= \
 end_compiling_message= \
 	echo ${TTY_GREEN}* ${TTY_WHITE}$(1) has been compiled with success. ${TTY_RESET}
 
-m_and_mi = make && make install
+prev_configured_message= \
+	echo ${TTY_GREEN}* ${TTY_WHITE}$(1) has been previously configured. ${TTY_RESET}
+
+
+m_and_mi = touch 'configure.done' && if [ ! -f 'compile.done' ]; then \
+	make && make install && touch 'compile.done'; \
+else \
+	echo ${TTY_GREEN}* ${TTY_WHITE}$(1) previously compiled. ${TTY_RESET}; \
+fi 
 
 init: 
 	@echo ${TTY_BLUE}==\> ${TTY_WHITE}Creating directories... ${TTY_RESET}
@@ -140,61 +148,60 @@ init:
 
 faac: 
 	@$(call start_compiling_message, faac)
-	@cd ${LIB_DIR}/${FAAC_CODEC} && ${CONFIGURE_STATIC} && $(call m_and_mi)
-	@$(call end_compiling_message, faac)
+	@cd ${LIB_DIR}/${FAAC_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,faac); fi && $(call m_and_mi,faac);
+	@$(call end_compiling_message,faac)
 
 gsm: 
-	@$(call start_compiling_message, gsm)
+	@$(call start_compiling_message,gsm)
 	@cd ${LIB_DIR}/${GSM_CODEC} && make
 	@cd ${LIB_DIR}/${GSM_CODEC} && cp lib/* ${OLIBS_DIR}/lib
 	@cd ${LIB_DIR}/${GSM_CODEC} && cp inc/gsm.h ${OLIBS_DIR}/include/gsm/
-	@$(call end_compiling_message, gsm)
+	@$(call end_compiling_message,gsm)
 
 lame: 
-	@$(call start_compiling_message, lame)
-	@cd ${LIB_DIR}/${LAME_CODEC} && ${CONFIGURE_STATIC} && $(call m_and_mi)
-	@$(call end_compiling_message, lame)
+	@$(call start_compiling_message,lame)
+	@cd ${LIB_DIR}/${LAME_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,lame); fi && $(call m_and_mi,lame);
+	@$(call end_compiling_message,lame)
 	
 ogg: 
-	@$(call start_compiling_message, ogg)
-	@cd ${LIB_DIR}/${OGG_CODEC} && ${CONFIGURE_STATIC} && $(call m_and_mi)
-	@$(call end_compiling_message, ogg)
+	@$(call start_compiling_message,ogg)
+	@cd ${LIB_DIR}/${OGG_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,ogg); fi && $(call m_and_mi,ogg);
+	@$(call end_compiling_message,ogg)
 
 theora: 
-	@$(call start_compiling_message, theora)
-	@cd ${LIB_DIR}/${THEORA_CODEC} && ${CONFIGURE_STATIC} && $(call m_and_mi)
-	@$(call end_compiling_message, theora)
+	@$(call start_compiling_message,theora)
+	@cd ${LIB_DIR}/${THEORA_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,theora); fi && $(call m_and_mi,theora);
+	@$(call end_compiling_message,theora)
 
 vorbis: 
 	@$(call start_compiling_message, vorbis)
-	@cd ${LIB_DIR}/${VORBIS_CODEC} && ${CONFIGURE_STATIC} && $(call m_and_mi)
-	@$(call end_compiling_message, vorbis)
+	@cd ${LIB_DIR}/${VORBIS_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,vorbis); fi && $(call m_and_mi,vorbis);
+	@$(call end_compiling_message,vorbis)
 
 vpx: 
-	@$(call start_compiling_message, vpx)
-	@cd ${LIB_DIR}/${VPX_CODEC} && ${CONFIGURE_AND_PREFIX} && $(call m_and_mi)
-	@$(call end_compiling_message, vpx)
+	@$(call start_compiling_message,vpx)
+	@cd ${LIB_DIR}/${VPX_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_AND_PREFIX}; else $(call prev_configured_message,vpx); fi && $(call m_and_mi,vpx);
+	@$(call end_compiling_message,vpx)
 	
 amr: 
-	@$(call start_compiling_message, amr)
-	@cd ${LIB_DIR}/${AMR_CODEC} && ${CONFIGURE_STATIC} && $(call m_and_mi)
-	@$(call end_compiling_message, amr)
+	@$(call start_compiling_message,amr)
+	@cd ${LIB_DIR}/${AMR_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,amr); fi && $(call m_and_mi,amr);
+	@$(call end_compiling_message,amr)
 	
-
 x264: 
-	@$(call start_compiling_message, x264)
-	@cd ${LIB_DIR}/${X264_CODEC} && ${CONFIGURE_STATIC} && $(call m_and_mi)
-	@$(call end_compiling_message, x264)
+	@$(call start_compiling_message,x264)
+	@cd ${LIB_DIR}/${X264_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,x264); fi && $(call m_and_mi,x264);
+	@$(call end_compiling_message,x264)
 
 xvid: 
-	@$(call start_compiling_message, xvid)
-	@cd ${LIB_DIR}/${XVID_CODEC} && ${CONFIGURE_STATIC} ${XVID_CONFIGURE_ARGS} && $(call m_and_mi)
-	@$(call end_compiling_message, xvid)
+	@$(call start_compiling_message,xvid)
+	@cd ${LIB_DIR}/${XVID_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC} ${XVID_CONFIGURE_ARGS}; else $(call prev_configured_message,xvid); fi && $(call m_and_mi,xvid);
+	@$(call end_compiling_message,xvid)
 
 ffmpeg: 
-	@$(call start_compiling_message, ffmpeg)
-	@cd ${TOOLS_DIR}/${FFMPEG_TOOL} && ${CONFIGURE_FFMPEG} && $(call m_and_mi)
-	@$(call end_compiling_message, ffmpeg)
+	@$(call start_compiling_message,ffmpeg)
+	@cd ${TOOLS_DIR}/${FFMPEG_TOOL} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_FFMPEG}; else $(call prev_configured_message,ffmpeg); fi && $(call m_and_mi,ffmpeg);
+	@$(call end_compiling_message,ffmpeg)
 
 
 # BOOTSTRAP A NEW FFMPEG BUILD ENV FROM SCRATCH
@@ -204,7 +211,7 @@ download_archive = cd ${ARCH_DIR} && wget $(1)
 clone_from_git = git clone $(1)
 clone_from_svn = svn checkout $(1)
 
-bootstrap: init_bootstrap cleanall download_sources
+bootstrap: init_bootstrap cleanall download_sources all
 
 init_bootstrap:
 	@mkdir -p ${ARCH_DIR}
@@ -218,7 +225,7 @@ download_sources:
 	@for i in ${GIT_SOURCES}; do cd ${LIB_DIR} && $(call clone_from_git,$$i) && $(call print_done) && echo; done
 	
 	@echo  && echo ${TTY_BLUE}==\>${TTY_WHITE} Unarchiving sources... ${TTY_RESET}
-	@cd ${ARCH_DIR} && for file in `ls *.tar.gz`; do  cd ${LIB_DIR} && tar -zxvf ${ARCH_DIR}/$$file && $(call print_done) && echo; done
+	@cd ${ARCH_DIR} && for file in `ls *.tar.gz`; do  cd ${LIB_DIR} && tar -zxvf ${ARCH_DIR}/$$file $(call print_done) && echo; done
 	@cd ${ARCH_DIR} && for file in `ls *.tar.bz2`; do  cd ${LIB_DIR} && tar -xjvf ${ARCH_DIR}/$$file && $(call print_done) && echo; done	
 
 	@echo  && echo ${TTY_BLUE}==\>${TTY_WHITE} Downloading tools... ${TTY_RESET}
@@ -234,7 +241,7 @@ cleanall:
 	
 clean:
 	@echo && echo ${TTY_BLUE}==\>${TTY_WHITE} Cleaning compiled directories ${TTY_RESET}
-	@for i in ${ALL_LIBS}; do cd ${LIB_DIR}/$$i && make clean; done
-	@for i in ${ALL_TOOLS}; do cd ${TOOLS_DIR}/$$i && make clean; done
+	@for i in ${ALL_LIBS}; do cd ${LIB_DIR}/$$i && make clean && rm -f 'compile.done' && rm -f 'configure.done'; done
+	@for i in ${ALL_TOOLS}; do cd ${TOOLS_DIR}/$$i && make clean && rm -f 'compile.done' && rm -f 'configure.done'; done
 	@rm -rf ${PREFIX_DIR}/olibs/*
 	@$(call print_done)
