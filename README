@@ -1,7 +1,0 @@
-CREATE AN STATIC FFMPEG BINARY FROM SCRATCH COMPILING THE MOST RECENT FFMPEG AND ALL CODECS
-
-mkdir build
-cd build
-download Makefile
-make bootstrap
-make

@@ -97,7 +97,6 @@ DISABLED_FFMPEG_TOOLS += --disable-ffserver
 DISABLED_FFMPEG_TOOLS += --disable-ffprobe
 
 FFMPEG_CFLAGS += -I${OLIBS_DIR}/include
-FFMPEG_CFLAGS += --static 
 FFMPEG_LDFLAGS += -L${OLIBS_DIR}/lib
 
 CONFIGURE_FFMPEG = ${CONFIGURE_STATIC} ${ENABLED_FFMPEG_CODECS} ${DISABLED_FFMPEG_TOOLS} --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --prefix=${DIST_DIR}
@@ -106,10 +105,10 @@ ALL_LIBS = ${FAAC_CODEC} ${GSM_CODEC} ${LAME_CODEC} ${OGG_CODEC} ${THEORA_CODEC}
 
 ALL_TOOLS = ${FFMPEG_TOOL}
 
-SEGMENTER_GCC = gcc -I${DIST_DIR}/include -o ${TOOLS_DIR}/segmenter/segmenter ${TOOLS_DIR}/segmenter/segmenter.c -lm -lz -lbz2 `ls ${DIST_DIR}/lib/*.a` `ls ${OLIBS_DIR}/lib/*.a`
+SEGMENTER_GCC = gcc -I${DIST_DIR}/include -o segmenter segmenter.c -lm -lz -lbz2 `ls ${DIST_DIR}/lib/*.a` `ls ${OLIBS_DIR}/lib/*.a`
 
 
-all: init faac gsm lame ogg theora vorbis vpx amr x264 xvid ffmpeg qtfs message
+all: init faac gsm lame ogg theora vorbis vpx amr x264 xvid ffmpeg message
 
 # Helper methods
 print_done = \
@@ -206,7 +205,7 @@ qtfs:
 
 segmenter:
 	@$(call start_compiling_message,segmenter)
-	@cd ${TOOLS_DIR}/${FFMPEG_TOOL}/tools && ${SEGMENTER_GCC}
+	@cd ${TOOLS_DIR}/segmenter && ${SEGMENTER_GCC} && cp segmenter ${DIST_DIR}/bin/segmenter
 	@$(call end_compiling_message,segmenter)
 	
 # BOOTSTRAP A NEW FFMPEG BUILD ENV FROM SCRATCH
@@ -239,7 +238,7 @@ download_sources:
 	@for i in ${GIT_SOURCES}; do cd ${LIB_DIR} && $(call clone_from_git,$$i) && $(call print_done) && echo; done
 	
 	@echo  && echo ${TTY_BLUE}==\>${TTY_WHITE} Unarchiving sources... ${TTY_RESET}
-	@cd ${ARCH_DIR} && for file in `ls *.tar.gz`; do  cd ${LIB_DIR} && tar -zxvf ${ARCH_DIR}/$$file $(call print_done) && echo; done
+	@cd ${ARCH_DIR} && for file in `ls *.tar.gz`; do  cd ${LIB_DIR} && tar -zxvf ${ARCH_DIR}/$$file && $(call print_done) && echo; done
 	@cd ${ARCH_DIR} && for file in `ls *.tar.bz2`; do  cd ${LIB_DIR} && tar -xjvf ${ARCH_DIR}/$$file && $(call print_done) && echo; done	
 
 	@echo  && echo ${TTY_BLUE}==\>${TTY_WHITE} Downloading tools... ${TTY_RESET}
@@ -248,9 +247,8 @@ download_sources:
 	@echo ${TTY_GREEN}*${TTY_WHITE} All sources are ready to be compiled.${TTY_RESET}
 
 install:
-	@echo ${TTY_BLUE}==\>${TTY_WHITE} Installing ffmpeg binary... ${TTY_RESET}
-	cp ${DIST_DIR}/bin/ffmpeg /usr/bin/ffmpeg
-	cp ${DIST_DIR}/bin/qt-faststart /usr/bin/qt-faststart
+	@echo ${TTY_BLUE}==\>${TTY_WHITE} Installing all binaries... ${TTY_RESET}
+	cp ${DIST_DIR}/bin/* /usr/bin/
 	
 message:
 	@echo
@@ -265,6 +263,7 @@ cleanall:
 	@echo ${TTY_BLUE}==\>${TTY_WHITE} Removing all download sources ${TTY_RESET}
 	rm -rf ${PREFIX_DIR}/archives/*
 	rm -rf ${PREFIX_DIR}/libraries/*
+	rm -rf ${PREFIX_DIR}/tools/*
 	@$(call print_done)
 	
 clean:
