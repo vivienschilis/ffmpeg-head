@@ -14,6 +14,7 @@ TOOLS_DIR = ${PREFIX_DIR}/tools
 OLIBS_DIR = ${PREFIX_DIR}/olibs
 DIST_DIR = ${PREFIX_DIR}/dist
 ARCH_DIR = ${PREFIX_DIR}/archives
+PATCH_DIR = ${PREFIX_DIR}/patches
 
 # URL TO DOWNLOAD ALL CODECS ARCHIVES
 
@@ -211,9 +212,18 @@ clone_from_svn = svn checkout $(1)
 
 bootstrap: init_bootstrap cleanall download_sources
 
+patch:
+	@echo ${TTY_BLUE}==\> ${TTY_WHITE}Patching ffmpeg $(1)... ${TTY_RESET}
+	@cd ${PATCH_DIR} && for diff in `ls *.patch`; do echo \* $$diff && patch -N -d ${TOOLS_DIR}/ffmpeg -p0 -i ${PATCH_DIR}/$$diff; done
+	
+unpatch:
+		@echo ${TTY_BLUE}==\> ${TTY_WHITE}Unpatching ffmpeg $(1)... ${TTY_RESET}
+		@cd ${PATCH_DIR} && for diff in `ls -r *.patch`; do echo \* $$diff && patch -R -d ${TOOLS_DIR}/ffmpeg -p0 -i ${PATCH_DIR}/$$diff; done
+
 init_bootstrap:
 	@mkdir -p ${ARCH_DIR}
 	@mkdir -p ${LIB_DIR}
+	@mkdir -p ${PATCH_DIR}
 
 download_sources:
 	@echo && echo ${TTY_BLUE}==\>${TTY_WHITE} Downloading sources... ${TTY_RESET}
