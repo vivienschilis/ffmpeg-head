@@ -240,6 +240,7 @@ download_sources:
 	@echo ${TTY_GREEN}*${TTY_WHITE} All sources are ready to be compiled.${TTY_RESET}
 
 install:
+	@echo ${TTY_BLUE}==\>${TTY_WHITE} Installing ffmpeg binary... ${TTY_RESET}
 	cp ${TOOLS_DIR}/ffmpeg/ffmpeg /usr/bin/ffmpeg
 	
 cleanall:
