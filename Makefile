@@ -106,27 +106,7 @@ ALL_LIBS = ${FAAC_CODEC} ${GSM_CODEC} ${LAME_CODEC} ${OGG_CODEC} ${THEORA_CODEC}
 
 ALL_TOOLS = ${FFMPEG_TOOL}
 
-SEGMENTER_GCC = gcc -I${DIST_DIR}/include -o ${TOOLS_DIR}/segmenter/segmenter ${TOOLS_DIR}/segmenter/segmenter.c -lm -lz -lbz2 \
-${DIST_DIR}/lib/libavcodec.a           \
-${DIST_DIR}/lib/libavcore.a            \
-${DIST_DIR}/lib/libavformat.a          \
-${DIST_DIR}/lib/libavutil.a            \
-${DIST_DIR}/lib/libavfilter.a          \
-${OLIBS_DIR}/lib/libmp3lame.a          \
-${OLIBS_DIR}/lib/libvorbis.a           \
-${OLIBS_DIR}/lib/libvorbisenc.a        \
-${OLIBS_DIR}/lib/libopencore-amrnb.a   \
-${OLIBS_DIR}/lib/libopencore-amrwb.a   \
-${OLIBS_DIR}/lib/libx264.a             \
-${OLIBS_DIR}/lib/libogg.a              \
-${OLIBS_DIR}/lib/libtheora.a           \
-${OLIBS_DIR}/lib/libtheoradec.a        \
-${OLIBS_DIR}/lib/libtheoraenc.a        \
-${OLIBS_DIR}/lib/libxvidcore.a         \
-${OLIBS_DIR}/lib/libfaac.a             \
-${OLIBS_DIR}/lib/libvpx.a              \
-${OLIBS_DIR}/lib/libgsm.a              \
-${OLIBS_DIR}/lib/libmp3lame.a          
+SEGMENTER_GCC = gcc -I${DIST_DIR}/include -o ${TOOLS_DIR}/segmenter/segmenter ${TOOLS_DIR}/segmenter/segmenter.c -lm -lz -lbz2 `ls ${DIST_DIR}/lib/*.a` `ls ${OLIBS_DIR}/lib/*.a`
 
 
 all: init faac gsm lame ogg theora vorbis vpx amr x264 xvid ffmpeg qtfs message
