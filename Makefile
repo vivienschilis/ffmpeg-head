@@ -70,7 +70,10 @@ GIT_SOURCES = ${VPX_CODEC_URL} ${X264_CODEC_URL}
 FFMPEG_TOOL=ffmpeg
 FFMPEG_TOOL_URL="svn://svn.ffmpeg.org/ffmpeg/trunk ffmpeg"
 
-TOOLS_SVN_SOURCES = ${FFMPEG_TOOL_URL}
+SEGMENTER_TOOL_URL=http://svn.assembla.com/svn/legend/segmenter/
+SEGMENTER_TOOL=segmenter
+
+TOOLS_SVN_SOURCES = ${FFMPEG_TOOL_URL} ${SEGMENTER_TOOL_URL}
 
 ENABLED_FFMPEG_CODECS += --enable-postproc
 ENABLED_FFMPEG_CODECS += --enable-nonfree
@@ -103,15 +106,30 @@ ALL_LIBS = ${FAAC_CODEC} ${GSM_CODEC} ${LAME_CODEC} ${OGG_CODEC} ${THEORA_CODEC}
 
 ALL_TOOLS = ${FFMPEG_TOOL}
 
-all: init faac gsm lame ogg theora vorbis vpx amr x264 xvid ffmpeg message
+SEGMENTER_GCC = gcc -I${DIST_DIR}/include -o ${TOOLS_DIR}/segmenter/segmenter ${TOOLS_DIR}/segmenter/segmenter.c -lm -lz -lbz2 \
+${DIST_DIR}/lib/libavcodec.a           \
+${DIST_DIR}/lib/libavcore.a            \
+${DIST_DIR}/lib/libavformat.a          \
+${DIST_DIR}/lib/libavutil.a            \
+${DIST_DIR}/lib/libavfilter.a          \
+${OLIBS_DIR}/lib/libmp3lame.a          \
+${OLIBS_DIR}/lib/libvorbis.a           \
+${OLIBS_DIR}/lib/libvorbisenc.a        \
+${OLIBS_DIR}/lib/libopencore-amrnb.a   \
+${OLIBS_DIR}/lib/libopencore-amrwb.a   \
+${OLIBS_DIR}/lib/libx264.a             \
+${OLIBS_DIR}/lib/libogg.a              \
+${OLIBS_DIR}/lib/libtheora.a           \
+${OLIBS_DIR}/lib/libtheoradec.a        \
+${OLIBS_DIR}/lib/libtheoraenc.a        \
+${OLIBS_DIR}/lib/libxvidcore.a         \
+${OLIBS_DIR}/lib/libfaac.a             \
+${OLIBS_DIR}/lib/libvpx.a              \
+${OLIBS_DIR}/lib/libgsm.a              \
+${OLIBS_DIR}/lib/libmp3lame.a          
 
-message:
-	@echo
-	@echo "---------------------------------------------------------------"
-	@echo " FFMPEG has been successfully built."
-	@echo " To install them on your system, you can run '(sudo) make install'"
-	@echo "---------------------------------------------------------------"
-	@echo
+
+all: init faac gsm lame ogg theora vorbis vpx amr x264 xvid ffmpeg qtfs message
 
 # Helper methods
 print_done = \
@@ -201,6 +219,16 @@ ffmpeg:
 	@cd ${TOOLS_DIR}/${FFMPEG_TOOL} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_FFMPEG}; else $(call prev_configured_message,ffmpeg); fi && $(call m_and_mi,ffmpeg);
 	@$(call end_compiling_message,ffmpeg)
 
+qtfs: 
+	@$(call start_compiling_message,qt-faststart)
+	@cd ${TOOLS_DIR}/${FFMPEG_TOOL}/tools && gcc qt-faststart.c -o qt-faststart && cp qt-faststart ${DIST_DIR}/bin/qt-faststart
+	@$(call end_compiling_message,qt-faststart)
+
+segmenter:
+	@$(call start_compiling_message,segmenter)
+	@cd ${TOOLS_DIR}/${FFMPEG_TOOL}/tools && ${SEGMENTER_GCC}
+	@$(call end_compiling_message,segmenter)
+	
 # BOOTSTRAP A NEW FFMPEG BUILD ENV FROM SCRATCH
 
 # DOWNLOAD METHODS
@@ -241,8 +269,18 @@ download_sources:
 
 install:
 	@echo ${TTY_BLUE}==\>${TTY_WHITE} Installing ffmpeg binary... ${TTY_RESET}
-	cp ${TOOLS_DIR}/ffmpeg/ffmpeg /usr/bin/ffmpeg
+	cp ${DIST_DIR}/bin/ffmpeg /usr/bin/ffmpeg
+	cp ${DIST_DIR}/bin/qt-faststart /usr/bin/qt-faststart
 	
+message:
+	@echo
+	@echo "---------------------------------------------------------------"
+	@echo " FFMPEG has been successfully built."
+	@echo " To install them on your system, you can run '(sudo) make install'"
+	@echo "---------------------------------------------------------------"
+	@echo
+
+
 cleanall:
 	@echo ${TTY_BLUE}==\>${TTY_WHITE} Removing all download sources ${TTY_RESET}
 	rm -rf ${PREFIX_DIR}/archives/*
@@ -255,6 +293,3 @@ clean:
 	@for i in ${ALL_TOOLS}; do cd ${TOOLS_DIR}/$$i && make clean && rm -f 'compile.done' && rm -f 'configure.done'; done
 	@rm -rf ${PREFIX_DIR}/olibs/*
 	@$(call print_done)
-
-test: 
-	@echo ${PREFIX_DIR}
