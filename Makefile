@@ -229,6 +229,7 @@ init_bootstrap:
 	@mkdir -p ${ARCH_DIR}
 	@mkdir -p ${LIB_DIR}
 	@mkdir -p ${PATCH_DIR}
+	@mkdir -p ${TOOLS_DIR}
 
 download_sources:
 	@echo && echo ${TTY_BLUE}==\>${TTY_WHITE} Downloading sources... ${TTY_RESET}
