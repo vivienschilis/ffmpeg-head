@@ -1,0 +1,154 @@
+#!/bin/sh
+#
+# Small utility to fetch and unpack archives on the web (with cache)
+#
+# Depends on : curl, tar
+#
+
+set -e
+set +u
+
+# ENV vars, inherited from external
+CACHE=${CACHE:-1}
+UNPACK=${UNPACK:-1}
+VERBOSE=${VERBOSE:-0}
+
+TARGET_DIR=${TARGET_DIR:-`pwd`}
+if [ -n "$HOME" ]; then
+  CACHE_DIR=${CACHE_DIR:-$HOME/.cache/fetchurl}
+else
+  CACHE_DIR=${CACHE_DIR:-}
+fi
+TMP_DIR=${TMP_DIR:-/tmp}
+
+URL=$1
+
+set -u
+
+stderr () {
+  echo $@ 1>&2
+}
+
+sh () {
+  echo $ $@
+  if [ "$VERBOSE" -ne 0 ]; then
+    $@
+  else
+    $@ >/dev/null 2>&1
+  fi
+}
+
+expand_path() {
+	here=`pwd`
+	cd $1
+	echo `pwd -P`
+	cd "$here"
+}
+
+usage() {
+  echo "Usage: fetchurl url"
+  echo "CACHE=${CACHE}"
+  echo "UNPACK=${UNPACK}"
+  echo "VERBOSE=${VERBOSE}"
+
+  echo "TARGET_DIR=${TARGET_DIR}"
+  echo "CACHE_DIR=${CACHE_DIR}"
+  echo "TMP_DIR=${TMP_DIR}"
+
+  echo "URL=${URL}"
+  exit 1
+}
+
+fetch_from_http() {
+  sh curl -L -o "$1" "$2"
+}
+
+fetch_from_git() {
+  tmp_unzip=${tmp_file%%.tar.gz}
+  sh rm -rf "$tmp_unzip"
+  sh git clone "$2" "$tmp_unzip"
+  sh tar -zcf "$tmp_file" -C "$TMP_DIR" `basename $tmp_unzip`
+  # sh rm -rf "$tmp_unzip"
+}
+
+fetch_from_svn() {
+  sh svn checkout "$2" "$1"
+}
+
+extract_scheme() {
+ scheme=`echo "$1" | awk '{split($0,a,"://"); print a[1]}'`
+}
+
+if [ -z "$URL" ]; then
+  stderr "ERROR: missing url"
+  usage
+fi
+
+if [ -z "$CACHE_DIR" ] && [ "$CACHE" -ne 0 ]; then
+  stderr "ERROR: missing cache dir"
+  usage
+fi
+
+scheme= extract_scheme "$URL"
+filename=`basename "$URL" | sed 's/\?.*//'`
+case $scheme in
+  git)
+      extname=`echo "$filename" | awk -F . '{print $NF}'`
+      filename="${filename%.$extname}.tar.gz"
+      tmp_file="$TMP_DIR/$filename"
+      cache_file="$CACHE_DIR/$filename";;
+  *)
+      tmp_file="$TMP_DIR/$filename"
+      cache_file="$CACHE_DIR/$filename";;
+esac
+
+mkdir -p "$CACHE_DIR"
+
+# Fetch
+if [ "$CACHE" -eq 0 ] || [ ! -f "$cache_file" ]; then
+  rm -rf "$tmp_file"
+  case $scheme in
+  git)
+    fetch_from_git "$tmp_file" "$URL";;
+  svn)
+    fetch_from_svn "$tmp_file" "$URL";;
+  *)
+    fetch_from_http "$tmp_file" "$URL";;
+  esac
+
+   sh mv -f "$tmp_file" "$cache_file"
+fi
+
+# TODO: checksums
+
+# Unpack
+if [ "$UNPACK" -ne 0 ]; then
+
+  if [ "$filename" != "${filename%.tar.gz}" ]; then
+    extname=.tar.gz
+  elif [ "$filename" != "${filename%.tgz}" ]; then
+    extname=.tgz
+  elif [ "$filename" != "${filename%.tar.bz2}" ]; then
+    extname=.tar.bz2
+  else
+    stderr extension of $filename is not supported
+    exit 1
+  fi
+
+  target_dir=`expand_path "$TARGET_DIR"`
+  mkdir -p "$target_dir"
+  sh cd "$target_dir"
+ 
+  case "$extname" in
+    .tar.gz|.tgz)    
+      sh tar xzvf "$cache_file"
+    ;;
+    .tar.bz2)
+      sh tar xjvf "$cache_file"
+    ;;
+    *)
+      stderr BUG, this should not happen
+      exit 1
+    ;;
+  esac
+fi

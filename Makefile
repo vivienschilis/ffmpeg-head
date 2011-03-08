@@ -13,12 +13,11 @@ LIB_DIR = ${PREFIX_DIR}/libraries
 TOOLS_DIR = ${PREFIX_DIR}/tools
 OLIBS_DIR = ${PREFIX_DIR}/olibs
 DIST_DIR = ${PREFIX_DIR}/dist
-ARCH_DIR = ${PREFIX_DIR}/archives
 PATCH_DIR = ${PREFIX_DIR}/patches
 
 # URL TO DOWNLOAD ALL CODECS ARCHIVES
 
-# TARGZ URL
+# LIB SOURCES
 GSM_CODEC_URL = http://www.finalmediaplayer.com/downloads/3rdparty/libgsm_1.0.13.orig.tar.gz
 GSM_CODEC = gsm-1.0-pl13
 
@@ -49,31 +48,29 @@ endif
 AMR_CODEC_URL = http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/0.1.2/opencore-amr-0.1.2.tar.gz
 AMR_CODEC = opencore-amr-0.1.2
 
-TARGZ_SOURCES = ${GSM_CODEC_URL} ${FAAC_CODEC_URL} ${FAAD2_CODEC_URL} ${LAME_CODEC_URL} ${OGG_CODEC_URL} ${VORBIS_CODEC_URL} ${XVID_CODEC_URL} ${AMR_CODEC_URL}
-
-# TARBZ2 URL
 THEORA_CODEC_URL = http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2
 THEORA_CODEC = libtheora-1.1.1
 
-TARBZ2_SOURCES = ${THEORA_CODEC_URL}
-
-## GIT
 VPX_CODEC_URL = git://review.webmproject.org/libvpx.git
 VPX_CODEC = libvpx
 
 X264_CODEC_URL = git://git.videolan.org/x264.git
 X264_CODEC = x264
 
-GIT_SOURCES = ${VPX_CODEC_URL} ${X264_CODEC_URL}
+LIB_SOURCES = ${GSM_CODEC_URL} ${FAAC_CODEC_URL} ${FAAD2_CODEC_URL} ${LAME_CODEC_URL} ${OGG_CODEC_URL} ${VORBIS_CODEC_URL} ${XVID_CODEC_URL} ${AMR_CODEC_URL} ${THEORA_CODEC_URL} ${VPX_CODEC_URL} ${X264_CODEC_URL}
 
-# TOOLS
-FFMPEG_TOOL=ffmpeg
-FFMPEG_TOOL_URL="svn://svn.ffmpeg.org/ffmpeg/trunk ffmpeg"
+# TOOLS SOURCES
+FFMPEG_TOOL = ffmpeg
+FFMPEG_TOOL_URL = git://git.ffmpeg.org/ffmpeg.git
 
-SEGMENTER_TOOL_URL=http://svn.assembla.com/svn/legend/segmenter/
-SEGMENTER_TOOL=segmenter
+SEGMENTER_TOOL_URL = http://svn.assembla.com/svn/legend/segmenter/
+SEGMENTER_TOOL = segmenter
 
-TOOLS_SVN_SOURCES = ${FFMPEG_TOOL_URL} ${SEGMENTER_TOOL_URL}
+TOOLS_SVN_SOURCES = ${SEGMENTER_TOOL_URL}
+TOOLS_SOURCES = ${FFMPEG_TOOL_URL}
+
+
+# FFMPEG FLAGS
 
 ENABLED_FFMPEG_CODECS += --enable-postproc
 ENABLED_FFMPEG_CODECS += --enable-nonfree
@@ -87,7 +84,6 @@ ENABLED_FFMPEG_CODECS += --enable-libvorbis
 ENABLED_FFMPEG_CODECS += --enable-libgsm
 ENABLED_FFMPEG_CODECS += --enable-libvpx
 ENABLED_FFMPEG_CODECS += --enable-avfilter
-ENABLED_FFMPEG_CODECS += --enable-avfilter-lavf
 ENABLED_FFMPEG_CODECS += --enable-libopencore-amrnb
 ENABLED_FFMPEG_CODECS += --enable-libopencore-amrwb
 ENABLED_FFMPEG_CODECS += --enable-version3
@@ -99,14 +95,13 @@ DISABLED_FFMPEG_TOOLS += --disable-ffprobe
 FFMPEG_CFLAGS += -I${OLIBS_DIR}/include
 FFMPEG_LDFLAGS += -L${OLIBS_DIR}/lib
 
-CONFIGURE_FFMPEG = ${CONFIGURE_STATIC} ${ENABLED_FFMPEG_CODECS} ${DISABLED_FFMPEG_TOOLS} --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --prefix=${DIST_DIR}
+CONFIGURE_FFMPEG = ${CONFIGURE_STATIC} ${ENABLED_FFMPEG_CODECS} ${DISABLED_FFMPEG_TOOLS} --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --datadir=/usr/share/ffmpeg06 --bindir=${DIST_DIR}/bin --libdir=${DIST_DIR}/lib --prefix=/usr
 
 ALL_LIBS = ${FAAC_CODEC} ${GSM_CODEC} ${LAME_CODEC} ${OGG_CODEC} ${THEORA_CODEC} ${VORBIS_CODEC} ${VPX_CODEC} ${AMR_CODEC} ${X264_CODEC} ${XVID_CODEC}
-
 ALL_TOOLS = ${FFMPEG_TOOL}
 
-SEGMENTER_GCC = gcc -I${DIST_DIR}/include -o segmenter segmenter.c -lm -lz -lbz2 `ls ${DIST_DIR}/lib/*.a` `ls ${OLIBS_DIR}/lib/*.a`
-
+SEGMENTER_GCC = gcc -I${DIST_DIR}/include -o segmenter segmenter.c  -lm -lz -lbz2 -lpthread \
+${DIST_DIR}/lib/libswscale.a ${DIST_DIR}/lib/libavdevice.a ${DIST_DIR}/lib/libavformat.a  ${DIST_DIR}/lib/libavcodec.a  ${DIST_DIR}/lib/libavutil.a ${DIST_DIR}/lib/libavcore.a ${DIST_DIR}/lib/libavfilter.a  ${OLIBS_DIR}/lib/libvorbisfile.a ${OLIBS_DIR}/lib/libfaac.a  ${OLIBS_DIR}/lib/libtheora.a  ${OLIBS_DIR}/lib/libvpx.a ${OLIBS_DIR}/lib/libgsm.a ${OLIBS_DIR}/lib/libopencore-amrnb.a ${OLIBS_DIR}/lib/libtheoradec.a  ${OLIBS_DIR}/lib/libvorbisenc.a ${OLIBS_DIR}/lib/libx264.a ${OLIBS_DIR}/lib/libmp3lame.a  ${OLIBS_DIR}/lib/libopencore-amrwb.a ${OLIBS_DIR}/lib/libtheoraenc.a  ${OLIBS_DIR}/lib/libxvidcore.a ${OLIBS_DIR}/lib/libogg.a ${OLIBS_DIR}/lib/libvorbis.a 
 
 all: init faac gsm lame ogg theora vorbis vpx amr x264 xvid ffmpeg message
 
@@ -124,7 +119,7 @@ prev_configured_message= \
 	echo ${TTY_GREEN}* ${TTY_WHITE}$(1) has been previously configured. ${TTY_RESET}
 
 m_and_mi = touch 'configure.done' && if [ ! -f 'compile.done' ]; then \
-	make && make install && touch 'compile.done'; \
+	make -j 4 && make install && touch 'compile.done'; \
 else \
 	echo ${TTY_GREEN}* ${TTY_WHITE}$(1) previously compiled. ${TTY_RESET}; \
 fi 
@@ -195,7 +190,7 @@ xvid:
 
 ffmpeg: 
 	@$(call start_compiling_message,ffmpeg)
-	@cd ${TOOLS_DIR}/${FFMPEG_TOOL} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_FFMPEG}; else $(call prev_configured_message,ffmpeg); fi && $(call m_and_mi,ffmpeg);
+	@cd ${TOOLS_DIR}/${FFMPEG_TOOL} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_FFMPEG}; else $(call prev_configured_message,ffmpeg); fi && make
 	@$(call end_compiling_message,ffmpeg)
 
 qtfs: 
@@ -205,15 +200,14 @@ qtfs:
 
 segmenter:
 	@$(call start_compiling_message,segmenter)
-	@cd ${TOOLS_DIR}/segmenter && ${SEGMENTER_GCC} && cp segmenter ${DIST_DIR}/bin/segmenter
+	cd ${TOOLS_DIR}/segmenter && ${SEGMENTER_GCC} && cp segmenter ${DIST_DIR}/bin/segmenter
 	@$(call end_compiling_message,segmenter)
 	
 # BOOTSTRAP A NEW FFMPEG BUILD ENV FROM SCRATCH
 
 # DOWNLOAD METHODS
-download_archive = cd ${ARCH_DIR} && wget $(1)
-clone_from_git = git clone $(1)
-clone_from_svn = svn checkout $(1)
+download_archive = sh ../fetch_url.sh $1
+clone_from_svn = svn checkout $1
 
 bootstrap: init_bootstrap cleanall download_sources
 
@@ -222,31 +216,22 @@ patch:
 	@cd ${PATCH_DIR} && for diff in `ls *.patch`; do echo \* $$diff && patch -N -d ${TOOLS_DIR}/ffmpeg -p0 -i ${PATCH_DIR}/$$diff; done
 	
 unpatch:
-		@echo ${TTY_BLUE}==\> ${TTY_WHITE}Unpatching ffmpeg $(1)... ${TTY_RESET}
-		@cd ${PATCH_DIR} && for diff in `ls -r *.patch`; do echo \* $$diff && patch -R -d ${TOOLS_DIR}/ffmpeg -p0 -i ${PATCH_DIR}/$$diff; done
+	@echo ${TTY_BLUE}==\> ${TTY_WHITE}Unpatching ffmpeg $(1)... ${TTY_RESET}
+	@cd ${PATCH_DIR} && for diff in `ls -r *.patch`; do echo \* $$diff && patch -R -d ${TOOLS_DIR}/ffmpeg -p0 -i ${PATCH_DIR}/$$diff; done
 
 init_bootstrap:
-	@mkdir -p ${ARCH_DIR}
 	@mkdir -p ${LIB_DIR}
 	@mkdir -p ${PATCH_DIR}
 	@mkdir -p ${TOOLS_DIR}
 
 download_sources:
 	@echo && echo ${TTY_BLUE}==\>${TTY_WHITE} Downloading sources... ${TTY_RESET}
-	
-	@for i in ${TARGZ_SOURCES}; do $(call download_archive,$$i) && $(call print_done) && echo; done
-	@for i in ${TARBZ2_SOURCES}; do $(call download_archive,$$i) && $(call print_done) && echo; done	
-	@for i in ${GIT_SOURCES}; do cd ${LIB_DIR} && $(call clone_from_git,$$i) && $(call print_done) && echo; done
-	
-	@echo  && echo ${TTY_BLUE}==\>${TTY_WHITE} Unarchiving sources... ${TTY_RESET}
-	@cd ${ARCH_DIR} && for file in `ls *.tar.gz`; do  cd ${LIB_DIR} && tar -zxvf ${ARCH_DIR}/$$file && $(call print_done) && echo; done
-	@cd ${ARCH_DIR} && for file in `ls *.tar.bz2`; do  cd ${LIB_DIR} && tar -xjvf ${ARCH_DIR}/$$file && $(call print_done) && echo; done	
-
+	@for i in ${LIB_SOURCES}; do cd ${LIB_DIR} && $(call download_archive, $$i) && $(call print_done) && echo; done
 	@echo  && echo ${TTY_BLUE}==\>${TTY_WHITE} Downloading tools... ${TTY_RESET}
 	@for i in ${TOOLS_SVN_SOURCES}; do cd ${TOOLS_DIR} && $(call clone_from_svn,$$i) && $(call print_done) && echo; done
+	@for i in ${TOOLS_SOURCES}; do cd ${TOOLS_DIR} && $(call download_archive,$$i) && $(call print_done) && echo; done
 	
 	@echo ${TTY_GREEN}*${TTY_WHITE} All sources are ready to be compiled.${TTY_RESET}
-
 install:
 	@echo ${TTY_BLUE}==\>${TTY_WHITE} Installing all binaries... ${TTY_RESET}
 	cp ${DIST_DIR}/bin/* /usr/bin/
@@ -258,7 +243,6 @@ message:
 	@echo " To install them on your system, you can run '(sudo) make install'"
 	@echo "---------------------------------------------------------------"
 	@echo
-
 
 cleanall:
 	@echo ${TTY_BLUE}==\>${TTY_WHITE} Removing all download sources ${TTY_RESET}
