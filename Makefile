@@ -95,7 +95,7 @@ DISABLED_FFMPEG_TOOLS += --disable-ffprobe
 FFMPEG_CFLAGS += -I${OLIBS_DIR}/include
 FFMPEG_LDFLAGS += -L${OLIBS_DIR}/lib
 
-CONFIGURE_FFMPEG = ${CONFIGURE_STATIC} ${ENABLED_FFMPEG_CODECS} ${DISABLED_FFMPEG_TOOLS} --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --datadir=/usr/share/ffmpeg06 --bindir=${DIST_DIR}/bin --libdir=${DIST_DIR}/lib --prefix=/usr
+CONFIGURE_FFMPEG = ${CONFIGURE_STATIC} ${ENABLED_FFMPEG_CODECS} ${DISABLED_FFMPEG_TOOLS} --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --datadir=/usr/share/ffmpeg --bindir=${DIST_DIR}/bin --libdir=${DIST_DIR}/lib --prefix=/usr
 
 ALL_LIBS = ${FAAC_CODEC} ${GSM_CODEC} ${LAME_CODEC} ${OGG_CODEC} ${THEORA_CODEC} ${VORBIS_CODEC} ${VPX_CODEC} ${AMR_CODEC} ${X264_CODEC} ${XVID_CODEC}
 ALL_TOOLS = ${FFMPEG_TOOL}
