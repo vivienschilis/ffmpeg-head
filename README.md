@@ -1,38 +1,10 @@
 # FFMPEG bootstrap
 
-## What it is.
+Build ffmpeg, qt-faststart and segmenter with its dependencies statically.
 
-  It's a tool which helps people to build a static ffmpeg binary.
-  
-  It creates a build environment for ffmpeg.
-  
-  It downloads all recent codecs and tools and compile them.
-  
-  It reduces the numerous steps to achieve to an up to date ffmpeg by only using a few commands.
-  
-  It reduces your time spent to update your old ffmpeg when a new revision is out.
+git clone git://github.com/vivienschilis/ffmpeg_bootstrap.git
+cd ffmpeg_bootstrap
 
-## What it is not. 
-
-  It is not a package manager.
-  You need to have previously installed all compiling dependencies.
-  They should be pointed out by the autotools of each libraries.
-
-## How it works. 
-
-Create the root directory
-
-    mkdir build
-    cd build
-
-Download the Makefile
-
-    wget http://github.com/vivienschilis/ffmpeg_bootstrap/raw/master/Makefile
-  
-Build and download all files
-
-    make bootstrap
-  
 Apply ffmpeg patches (optional)
 
 If you to apply patches on ffmpeg, put your XX_yourfile_.patch file into the build/patches directory
