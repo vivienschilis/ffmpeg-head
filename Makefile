@@ -96,16 +96,13 @@ DISABLED_FFMPEG_TOOLS += --disable-ffplay
 DISABLED_FFMPEG_TOOLS += --disable-ffserver 
 DISABLED_FFMPEG_TOOLS += --disable-ffprobe
 
-FFMPEG_CFLAGS += -I${OLIBS_DIR}/include
-FFMPEG_LDFLAGS += -L${OLIBS_DIR}/lib
-
 CONFIGURE_FFMPEG = ${CONFIGURE_STATIC} ${ENABLED_FFMPEG_CODECS} ${DISABLED_FFMPEG_TOOLS} --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --datadir=/usr/share/ffmpeg --bindir=${DIST_DIR}/bin --incdir=${DIST_DIR}/include --libdir=${DIST_DIR}/lib --prefix=/usr
 
 ALL_LIBS = ${FAAC_CODEC} ${GSM_CODEC} ${LAME_CODEC} ${OGG_CODEC} ${THEORA_CODEC} ${VORBIS_CODEC} ${VPX_CODEC} ${AMR_CODEC} ${X264_CODEC} ${XVID_CODEC}
 ALL_TOOLS = ${FFMPEG_TOOL}
 
 SEGMENTER_GCC = gcc -I${DIST_DIR}/include -o segmenter segmenter.c  -lm -lz -lbz2 -lpthread \
-${DIST_DIR}/lib/libswscale.a ${DIST_DIR}/lib/libavdevice.a ${DIST_DIR}/lib/libavformat.a  ${DIST_DIR}/lib/libavcodec.a  ${DIST_DIR}/lib/libavutil.a ${DIST_DIR}/lib/libavcore.a ${DIST_DIR}/lib/libavfilter.a  ${OLIBS_DIR}/lib/libvorbisfile.a ${OLIBS_DIR}/lib/libfaac.a  ${OLIBS_DIR}/lib/libtheora.a  ${OLIBS_DIR}/lib/libvpx.a ${OLIBS_DIR}/lib/libgsm.a ${OLIBS_DIR}/lib/libopencore-amrnb.a ${OLIBS_DIR}/lib/libtheoradec.a  ${OLIBS_DIR}/lib/libvorbisenc.a ${OLIBS_DIR}/lib/libx264.a ${OLIBS_DIR}/lib/libmp3lame.a  ${OLIBS_DIR}/lib/libopencore-amrwb.a ${OLIBS_DIR}/lib/libtheoraenc.a  ${OLIBS_DIR}/lib/libxvidcore.a ${OLIBS_DIR}/lib/libogg.a ${OLIBS_DIR}/lib/libvorbis.a 
+${DIST_DIR}/lib/libswscale.a ${DIST_DIR}/lib/libavdevice.a ${DIST_DIR}/lib/libavformat.a  ${DIST_DIR}/lib/libavcodec.a  ${DIST_DIR}/lib/libavutil.a  ${DIST_DIR}/lib/libavfilter.a  ${OLIBS_DIR}/lib/libvorbisfile.a ${OLIBS_DIR}/lib/libfaac.a  ${OLIBS_DIR}/lib/libtheora.a  ${OLIBS_DIR}/lib/libvpx.a ${OLIBS_DIR}/lib/libgsm.a ${OLIBS_DIR}/lib/libopencore-amrnb.a ${OLIBS_DIR}/lib/libtheoradec.a  ${OLIBS_DIR}/lib/libvorbisenc.a ${OLIBS_DIR}/lib/libx264.a ${OLIBS_DIR}/lib/libmp3lame.a  ${OLIBS_DIR}/lib/libopencore-amrwb.a ${OLIBS_DIR}/lib/libtheoraenc.a  ${OLIBS_DIR}/lib/libxvidcore.a ${OLIBS_DIR}/lib/libogg.a ${OLIBS_DIR}/lib/libvorbis.a
 
 all: init faac gsm lame ogg theora vorbis vpx amr x264 xvid ffmpeg message
 
@@ -260,3 +257,10 @@ clean:
 	@for i in ${ALL_TOOLS}; do cd ${TOOLS_DIR}/$$i && make clean && rm -f 'compile.done' && rm -f 'configure.done'; done
 	@rm -rf ${PREFIX_DIR}/olibs/*
 	@$(call print_done)
+
+
+
+### TODO
+# System check before compiling
+# Recommend home-brew for Mac OS
+# Force install yasm for libvpx
