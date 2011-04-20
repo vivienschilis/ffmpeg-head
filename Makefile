@@ -13,6 +13,11 @@ OLIBS_DIR = ${PREFIX_DIR}/olibs
 DIST_DIR = ${PREFIX_DIR}/dist
 PATCH_DIR = ${PREFIX_DIR}/patches
 
+
+# EXPORT VARIABLES
+export LDFLAGS=-L${OLIBS_DIR}/lib
+export CFLAGS=-I${OLIBS_DIR}/include
+
 CONFIGURE_AND_PREFIX = ./configure --prefix=${OLIBS_DIR}
 CONFIGURE_STATIC = ${CONFIGURE_AND_PREFIX} --enable-static --disable-shared
 
