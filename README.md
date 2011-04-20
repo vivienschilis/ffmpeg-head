@@ -2,8 +2,8 @@
 
 Build ffmpeg, qt-faststart and segmenter with its dependencies statically.
 
-  git clone git://github.com/vivienschilis/ffmpeg_bootstrap.git
-  cd ffmpeg_bootstrap
+    git clone git://github.com/vivienschilis/ffmpeg_bootstrap.git
+    cd ffmpeg_bootstrap
 
 Apply ffmpeg patches (optional)
 
