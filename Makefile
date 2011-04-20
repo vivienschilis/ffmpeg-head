@@ -42,14 +42,8 @@ OGG_CODEC = libogg-1.2.0
 VORBIS_CODEC_URL = http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.1.tar.gz
 VORBIS_CODEC = libvorbis-1.3.1
 
-ifeq ($(UNAME), Darwin)
-	XVID_CODEC_URL = http://downloads.xvid.org/downloads/xvidcore-1.1.3.tar.gz
-	XVID_CODEC = xvidcore-1.1.3/build/generic
-	XVID_CONFIGURE_ARGS = --disable-assembly --disable-mmx
-else
-	XVID_CODEC_URL = http://downloads.xvid.org/downloads/xvidcore-1.2.2.tar.gz
-	XVID_CODEC = xvidcore/build/generic	
-endif
+XVID_CODEC_URL = http://downloads.xvid.org/downloads/xvidcore-1.2.2.tar.gz
+XVID_CODEC = xvidcore/build/generic	
 
 AMR_CODEC_URL = http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/0.1.2/opencore-amr-0.1.2.tar.gz
 AMR_CODEC = opencore-amr-0.1.2
@@ -264,7 +258,6 @@ clean:
 	@for i in ${ALL_TOOLS}; do cd ${TOOLS_DIR}/$$i && make clean && rm -f 'compile.done' && rm -f 'configure.done'; done
 	@rm -rf ${PREFIX_DIR}/olibs/*
 	@$(call print_done)
-
 
 
 ### TODO
