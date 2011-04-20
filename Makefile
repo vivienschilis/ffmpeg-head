@@ -240,6 +240,7 @@ fetch:
 	@echo ${TTY_GREEN}*${TTY_WHITE} All sources are ready to be compiled.${TTY_RESET}
 install:
 	@echo ${TTY_BLUE}==\>${TTY_WHITE} Installing all binaries... ${TTY_RESET}
+	cd ${TOOLS_DIR}/${FFMPEG_TOOL} && make install
 	cp ${DIST_DIR}/bin/* /usr/bin/
 	
 message:
