@@ -125,6 +125,12 @@ else \
 	echo ${TTY_GREEN}* ${TTY_WHITE}$(1) previously compiled. ${TTY_RESET}; \
 fi 
 
+make_only = touch 'configure.done' && if [ ! -f 'compile.done' ]; then \
+        make -j 4 && touch 'compile.done'; \
+else \
+        echo ${TTY_GREEN}* ${TTY_WHITE}$(1) previously compiled. ${TTY_RESET}; \
+fi
+
 init: 
 	@echo ${TTY_BLUE}==\> ${TTY_WHITE}Creating directories... ${TTY_RESET}
 	mkdir -p ${TOOLS_DIR}
@@ -191,7 +197,7 @@ xvid:
 
 ffmpeg: 
 	@$(call start_compiling_message,ffmpeg)
-	@cd ${TOOLS_DIR}/${FFMPEG_TOOL} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_FFMPEG}; else $(call prev_configured_message,ffmpeg); fi && make
+	@cd ${TOOLS_DIR}/${FFMPEG_TOOL} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_FFMPEG}; else $(call prev_configured_message,ffmpeg); fi && $(call make_only,ffmpeg)
 	@$(call end_compiling_message,ffmpeg)
 
 qtfs: 
