@@ -7,13 +7,14 @@ TTY_RESET = \\033[0m
 
 #PATH VARIABLES
 PREFIX_DIR =$(shell pwd)
-CONFIGURE_AND_PREFIX = ./configure --prefix=${OLIBS_DIR}
-CONFIGURE_STATIC = ${CONFIGURE_AND_PREFIX} --enable-static --disable-shared
 LIB_DIR = ${PREFIX_DIR}/libraries
 TOOLS_DIR = ${PREFIX_DIR}/tools
 OLIBS_DIR = ${PREFIX_DIR}/olibs
 DIST_DIR = ${PREFIX_DIR}/dist
 PATCH_DIR = ${PREFIX_DIR}/patches
+
+CONFIGURE_AND_PREFIX = ./configure --prefix=${OLIBS_DIR}
+CONFIGURE_STATIC = ${CONFIGURE_AND_PREFIX} --enable-static --disable-shared
 
 # URL TO DOWNLOAD ALL CODECS ARCHIVES
 
@@ -61,13 +62,11 @@ LIB_SOURCES = ${GSM_CODEC_URL} ${FAAC_CODEC_URL} ${FAAD2_CODEC_URL} ${LAME_CODEC
 
 # TOOLS SOURCES
 FFMPEG_TOOL = ffmpeg
-FFMPEG_TOOL_URL = git://git.ffmpeg.org/ffmpeg.git
-
-SEGMENTER_TOOL_URL = http://svn.assembla.com/svn/legend/segmenter/
+FFMPEG_TOOL_URL = git://git.videolan.org/ffmpeg.git
+SEGMENTER_TOOL_URL = git://github.com/vivienschilis/segmenter.git
 SEGMENTER_TOOL = segmenter
 
-TOOLS_SVN_SOURCES = ${SEGMENTER_TOOL_URL}
-TOOLS_SOURCES = ${FFMPEG_TOOL_URL}
+TOOLS_SOURCES = ${FFMPEG_TOOL_URL} ${SEGMENTER_TOOL_URL}
 
 
 # FFMPEG FLAGS
@@ -95,7 +94,7 @@ DISABLED_FFMPEG_TOOLS += --disable-ffprobe
 FFMPEG_CFLAGS += -I${OLIBS_DIR}/include
 FFMPEG_LDFLAGS += -L${OLIBS_DIR}/lib
 
-CONFIGURE_FFMPEG = ${CONFIGURE_STATIC} ${ENABLED_FFMPEG_CODECS} ${DISABLED_FFMPEG_TOOLS} --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --datadir=/usr/share/ffmpeg --bindir=${DIST_DIR}/bin --libdir=${DIST_DIR}/lib --prefix=/usr
+CONFIGURE_FFMPEG = ${CONFIGURE_STATIC} ${ENABLED_FFMPEG_CODECS} ${DISABLED_FFMPEG_TOOLS} --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --datadir=/usr/share/ffmpeg --bindir=${DIST_DIR}/bin --incdir=${DIST_DIR}/include --libdir=${DIST_DIR}/lib --prefix=/usr
 
 ALL_LIBS = ${FAAC_CODEC} ${GSM_CODEC} ${LAME_CODEC} ${OGG_CODEC} ${THEORA_CODEC} ${VORBIS_CODEC} ${VPX_CODEC} ${AMR_CODEC} ${X264_CODEC} ${XVID_CODEC}
 ALL_TOOLS = ${FFMPEG_TOOL}
@@ -206,10 +205,10 @@ segmenter:
 # BOOTSTRAP A NEW FFMPEG BUILD ENV FROM SCRATCH
 
 # DOWNLOAD METHODS
-download_archive = sh ../fetch_url.sh $1
+download_archive = sh ../fetch_url $1
 clone_from_svn = svn checkout $1
 
-bootstrap: init_bootstrap cleanall download_sources
+bootstrap: init_bootstrap cleanall fetch
 
 patch:
 	@echo ${TTY_BLUE}==\> ${TTY_WHITE}Patching ffmpeg $(1)... ${TTY_RESET}
@@ -224,11 +223,10 @@ init_bootstrap:
 	@mkdir -p ${PATCH_DIR}
 	@mkdir -p ${TOOLS_DIR}
 
-download_sources:
+fetch:
 	@echo && echo ${TTY_BLUE}==\>${TTY_WHITE} Downloading sources... ${TTY_RESET}
 	@for i in ${LIB_SOURCES}; do cd ${LIB_DIR} && $(call download_archive, $$i) && $(call print_done) && echo; done
 	@echo  && echo ${TTY_BLUE}==\>${TTY_WHITE} Downloading tools... ${TTY_RESET}
-	@for i in ${TOOLS_SVN_SOURCES}; do cd ${TOOLS_DIR} && $(call clone_from_svn,$$i) && $(call print_done) && echo; done
 	@for i in ${TOOLS_SOURCES}; do cd ${TOOLS_DIR} && $(call download_archive,$$i) && $(call print_done) && echo; done
 	
 	@echo ${TTY_GREEN}*${TTY_WHITE} All sources are ready to be compiled.${TTY_RESET}

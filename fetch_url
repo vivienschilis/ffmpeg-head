@@ -68,7 +68,7 @@ fetch_from_git() {
   sh rm -rf "$tmp_unzip"
   sh git clone "$2" "$tmp_unzip"
   sh tar -zcf "$tmp_file" -C "$TMP_DIR" `basename $tmp_unzip`
-  # sh rm -rf "$tmp_unzip"
+  sh rm -rf "$tmp_unzip"
 }
 
 fetch_from_svn() {
