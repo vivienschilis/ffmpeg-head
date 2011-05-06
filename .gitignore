@@ -1,5 +1,3 @@
-archives
-olibs
-tools
-libraries
-dist
+src/*
+runtime/*
+dist/*

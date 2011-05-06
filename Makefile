@@ -1,24 +1,34 @@
 UNAME := $(shell uname -s)
 
+all: init yasm faac gsm lame ogg theora vorbis vpx amr x264 xvid ffmpeg message
+
 TTY_WHITE = \\033[1\;39m
 TTY_BLUE = \\033[1\;34m
 TTY_GREEN = \\033[1\;32m
 TTY_RESET = \\033[0m
 
 #PATH VARIABLES
-PREFIX_DIR =$(shell pwd)
-LIB_DIR = ${PREFIX_DIR}/libraries
-TOOLS_DIR = ${PREFIX_DIR}/tools
-OLIBS_DIR = ${PREFIX_DIR}/olibs
-DIST_DIR = ${PREFIX_DIR}/dist
-PATCH_DIR = ${PREFIX_DIR}/patches
+TOP =$(shell pwd)
+SRC_DIR = ${TOP}/src
+RUNTIME_DIR = ${TOP}/runtime
+DIST_DIR = ${TOP}/dist
+PATCH_DIR = ${TOP}/patches
 
+${SRC_DIR}:
+	mkdir -p $@
+
+${RUNTIME_DIR}:
+	mkdir -p $@
+
+${DIST_DIR}:
+	mkdir -p $@
 
 # EXPORT VARIABLES
-export LDFLAGS=-L${OLIBS_DIR}/lib
-export CFLAGS=-I${OLIBS_DIR}/include
+export LDFLAGS=-L${RUNTIME_DIR}/lib
+export CFLAGS=-I${RUNTIME_DIR}/include
+export PATH:=${DIST_DIR}/bin:${RUNTIME_DIR}/bin:${PATH}
 
-CONFIGURE_AND_PREFIX = ./configure --prefix=${OLIBS_DIR}
+CONFIGURE_AND_PREFIX = ./configure --prefix=${RUNTIME_DIR}
 CONFIGURE_STATIC = ${CONFIGURE_AND_PREFIX} --enable-static --disable-shared
 
 # URL TO DOWNLOAD ALL CODECS ARCHIVES
@@ -96,9 +106,8 @@ ALL_LIBS = ${FAAC_CODEC} ${GSM_CODEC} ${LAME_CODEC} ${OGG_CODEC} ${THEORA_CODEC}
 ALL_TOOLS = ${FFMPEG_TOOL} ${SEGMENTER_TOOL}
 
 SEGMENTER_GCC = gcc -I${DIST_DIR}/include -o segmenter segmenter.c  -lm -lz -lbz2 -lpthread \
-${DIST_DIR}/lib/libswscale.a ${DIST_DIR}/lib/libavdevice.a ${DIST_DIR}/lib/libavformat.a  ${DIST_DIR}/lib/libavcodec.a  ${DIST_DIR}/lib/libavutil.a  ${DIST_DIR}/lib/libavfilter.a  ${OLIBS_DIR}/lib/libvorbisfile.a ${OLIBS_DIR}/lib/libfaac.a  ${OLIBS_DIR}/lib/libtheora.a  ${OLIBS_DIR}/lib/libvpx.a ${OLIBS_DIR}/lib/libgsm.a ${OLIBS_DIR}/lib/libopencore-amrnb.a ${OLIBS_DIR}/lib/libtheoradec.a  ${OLIBS_DIR}/lib/libvorbisenc.a ${OLIBS_DIR}/lib/libx264.a ${OLIBS_DIR}/lib/libmp3lame.a  ${OLIBS_DIR}/lib/libopencore-amrwb.a ${OLIBS_DIR}/lib/libtheoraenc.a  ${OLIBS_DIR}/lib/libxvidcore.a ${OLIBS_DIR}/lib/libogg.a ${OLIBS_DIR}/lib/libvorbis.a
+${DIST_DIR}/lib/libswscale.a ${DIST_DIR}/lib/libavdevice.a ${DIST_DIR}/lib/libavformat.a  ${DIST_DIR}/lib/libavcodec.a  ${DIST_DIR}/lib/libavutil.a  ${DIST_DIR}/lib/libavfilter.a  ${RUNTIME_DIR}/lib/libvorbisfile.a ${RUNTIME_DIR}/lib/libfaac.a  ${RUNTIME_DIR}/lib/libtheora.a  ${RUNTIME_DIR}/lib/libvpx.a ${RUNTIME_DIR}/lib/libgsm.a ${RUNTIME_DIR}/lib/libopencore-amrnb.a ${RUNTIME_DIR}/lib/libtheoradec.a  ${RUNTIME_DIR}/lib/libvorbisenc.a ${RUNTIME_DIR}/lib/libx264.a ${RUNTIME_DIR}/lib/libmp3lame.a  ${RUNTIME_DIR}/lib/libopencore-amrwb.a ${RUNTIME_DIR}/lib/libtheoraenc.a  ${RUNTIME_DIR}/lib/libxvidcore.a ${RUNTIME_DIR}/lib/libogg.a ${RUNTIME_DIR}/lib/libvorbis.a
 
-all: init faac gsm lame ogg theora vorbis vpx amr x264 xvid ffmpeg message
 
 # Helper methods
 print_done = \
@@ -125,83 +134,88 @@ else \
         echo ${TTY_GREEN}* ${TTY_WHITE}$(1) previously compiled. ${TTY_RESET}; \
 fi
 
-init: 
+init:
 	@echo ${TTY_BLUE}==\> ${TTY_WHITE}Creating directories... ${TTY_RESET}
-	mkdir -p ${TOOLS_DIR}
-	mkdir -p ${OLIBS_DIR}
+	mkdir -p ${SRC_DIR}
 	mkdir -p ${DIST_DIR}
-	mkdir -p ${OLIBS_DIR}/include
-	mkdir -p ${OLIBS_DIR}/include/gsm
-	mkdir -p ${OLIBS_DIR}/lib
-	mkdir -p ${OLIBS_DIR}/man
-	mkdir -p ${OLIBS_DIR}/man/man3
+	mkdir -p ${RUNTIME_DIR}
+	mkdir -p ${RUNTIME_DIR}/include
+	mkdir -p ${RUNTIME_DIR}/include/gsm
+	mkdir -p ${RUNTIME_DIR}/lib
+	mkdir -p ${RUNTIME_DIR}/man
+	mkdir -p ${RUNTIME_DIR}/man/man3
 	@$(call print_done)
+
+yasm:
+	@$(call start_compiling_message, yasm)
+	cd ${SRC_DIR}/${YASM_TOOL} && if [ ! -f 'configure.done' ]; then ${CONFIGURE_STATUS}; else $(call prev_configured_message,yasm); fi && $(call m_and_mi,yasm);
+	@$(call end_compiling_message,yasm)
 
 faac: 
 	@$(call start_compiling_message, faac)
-	@cd ${LIB_DIR}/${FAAC_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,faac); fi && $(call m_and_mi,faac);
+	@cd ${SRC_DIR}/${FAAC_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,faac); fi && $(call m_and_mi,faac);
 	@$(call end_compiling_message,faac)
 
 gsm: 
 	@$(call start_compiling_message,gsm)
-	@cd ${LIB_DIR}/${GSM_CODEC} && make
-	@cd ${LIB_DIR}/${GSM_CODEC} && cp lib/* ${OLIBS_DIR}/lib
-	@cd ${LIB_DIR}/${GSM_CODEC} && cp inc/gsm.h ${OLIBS_DIR}/include/gsm/
+	@cd ${SRC_DIR}/${GSM_CODEC} && make
+	@cd ${SRC_DIR}/${GSM_CODEC} && cp lib/* ${RUNTIME_DIR}/lib
+	@cd ${SRC_DIR}/${GSM_CODEC} && cp inc/gsm.h ${RUNTIME_DIR}/include/gsm/
 	@$(call end_compiling_message,gsm)
 
 lame: 
 	@$(call start_compiling_message,lame)
-	@cd ${LIB_DIR}/${LAME_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,lame); fi && $(call m_and_mi,lame);
+	@cd ${SRC_DIR}/${LAME_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,lame); fi && $(call m_and_mi,lame);
 	@$(call end_compiling_message,lame)
 	
 ogg: 
 	@$(call start_compiling_message,ogg)
-	@cd ${LIB_DIR}/${OGG_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,ogg); fi && $(call m_and_mi,ogg);
+	@cd ${SRC_DIR}/${OGG_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,ogg); fi && $(call m_and_mi,ogg);
 	@$(call end_compiling_message,ogg)
 
 theora: 
 	@$(call start_compiling_message,theora)
-	@cd ${LIB_DIR}/${THEORA_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,theora); fi && $(call m_and_mi,theora);
+	@cd ${SRC_DIR}/${THEORA_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,theora); fi && $(call m_and_mi,theora);
 	@$(call end_compiling_message,theora)
 
 vorbis: 
 	@$(call start_compiling_message, vorbis)
-	@cd ${LIB_DIR}/${VORBIS_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,vorbis); fi && $(call m_and_mi,vorbis);
+	@cd ${SRC_DIR}/${VORBIS_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,vorbis); fi && $(call m_and_mi,vorbis);
 	@$(call end_compiling_message,vorbis)
 
 vpx: 
 	@$(call start_compiling_message,vpx)
-	@cd ${LIB_DIR}/${VPX_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_AND_PREFIX}; else $(call prev_configured_message,vpx); fi && $(call m_and_mi,vpx);
+	@cd ${SRC_DIR}/${VPX_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_AND_PREFIX}; else $(call prev_configured_message,vpx); fi && $(call m_and_mi,vpx);
 	@$(call end_compiling_message,vpx)
 	
 amr: 
 	@$(call start_compiling_message,amr)
-	@cd ${LIB_DIR}/${AMR_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,amr); fi && $(call m_and_mi,amr);
+	@cd ${SRC_DIR}/${AMR_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,amr); fi && $(call m_and_mi,amr);
 	@$(call end_compiling_message,amr)
 	
 x264: 
 	@$(call start_compiling_message,x264)
-	@cd ${LIB_DIR}/${X264_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,x264); fi && $(call m_and_mi,x264);
+	@cd ${SRC_DIR}/${X264_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,x264); fi && $(call m_and_mi,x264);
 	@$(call end_compiling_message,x264)
 
 xvid: 
 	@$(call start_compiling_message,xvid)
-	@cd ${LIB_DIR}/${XVID_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC} ${XVID_CONFIGURE_ARGS}; else $(call prev_configured_message,xvid); fi && $(call m_and_mi,xvid);
+	@cd ${SRC_DIR}/${XVID_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC} ${XVID_CONFIGURE_ARGS}; else $(call prev_configured_message,xvid); fi && $(call m_and_mi,xvid);
 	@$(call end_compiling_message,xvid)
 
 ffmpeg: 
 	@$(call start_compiling_message,ffmpeg)
-	@cd ${TOOLS_DIR}/${FFMPEG_TOOL} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_FFMPEG}; else $(call prev_configured_message,ffmpeg); fi && $(call make_only,ffmpeg)
+	@cd ${SRC_DIR}/${FFMPEG_TOOL} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_FFMPEG}; else $(call prev_configured_message,ffmpeg); fi && $(call make_only,ffmpeg)
 	@$(call end_compiling_message,ffmpeg)
 
 qtfs: 
 	@$(call start_compiling_message,qt-faststart)
-	@cd ${TOOLS_DIR}/${FFMPEG_TOOL}/tools && gcc qt-faststart.c -o qt-faststart && cp qt-faststart ${DIST_DIR}/bin/qt-faststart
+	@cd ${SRC_DIR}/${FFMPEG_TOOL}/tools && gcc qt-faststart.c -o qt-faststart && cp qt-faststart ${DIST_DIR}/bin/qt-faststart
 	@$(call end_compiling_message,qt-faststart)
 
 segmenter:
 	@$(call start_compiling_message,segmenter)
-	cd ${TOOLS_DIR}/segmenter && ${SEGMENTER_GCC} && cp segmenter ${DIST_DIR}/bin/segmenter
+	cd ${SRC_DIR}/segmenter && ${SEGMENTER_GCC} && cp segmenter ${DIST_DIR}/bin/segmenter
 	@$(call end_compiling_message,segmenter)
 	
 # BOOTSTRAP A NEW FFMPEG BUILD ENV FROM SCRATCH
@@ -214,27 +228,27 @@ bootstrap: init_bootstrap cleanall fetch
 
 patch:
 	@echo ${TTY_BLUE}==\> ${TTY_WHITE}Patching ffmpeg $(1)... ${TTY_RESET}
-	@cd ${PATCH_DIR} && for diff in `ls *.patch`; do echo \* $$diff && patch -N -d ${TOOLS_DIR}/ffmpeg -p0 -i ${PATCH_DIR}/$$diff; done
+	@cd ${PATCH_DIR} && for diff in `ls *.patch`; do echo \* $$diff && patch -N -d ${SRC_DIR}/ffmpeg -p0 -i ${PATCH_DIR}/$$diff; done
 	
 unpatch:
 	@echo ${TTY_BLUE}==\> ${TTY_WHITE}Unpatching ffmpeg $(1)... ${TTY_RESET}
-	@cd ${PATCH_DIR} && for diff in `ls -r *.patch`; do echo \* $$diff && patch -R -d ${TOOLS_DIR}/ffmpeg -p0 -i ${PATCH_DIR}/$$diff; done
+	@cd ${PATCH_DIR} && for diff in `ls -r *.patch`; do echo \* $$diff && patch -R -d ${SRC_DIR}/ffmpeg -p0 -i ${PATCH_DIR}/$$diff; done
 
 init_bootstrap:
-	@mkdir -p ${LIB_DIR}
+	@mkdir -p ${SRC_DIR}
 	@mkdir -p ${PATCH_DIR}
-	@mkdir -p ${TOOLS_DIR}
+	@mkdir -p ${SRC_DIR}
 
 fetch:
 	@echo && echo ${TTY_BLUE}==\>${TTY_WHITE} Downloading sources... ${TTY_RESET}
-	@for i in ${LIB_SOURCES}; do cd ${LIB_DIR} && $(call download_archive, $$i) && $(call print_done) && echo; done
+	@for i in ${LIB_SOURCES}; do cd ${SRC_DIR} && $(call download_archive, $$i) && $(call print_done) && echo; done
 	@echo  && echo ${TTY_BLUE}==\>${TTY_WHITE} Downloading tools... ${TTY_RESET}
-	@for i in ${TOOLS_SOURCES}; do cd ${TOOLS_DIR} && $(call download_archive,$$i) && $(call print_done) && echo; done
+	@for i in ${TOOLS_SOURCES}; do cd ${SRC_DIR} && $(call download_archive,$$i) && $(call print_done) && echo; done
 	
 	@echo ${TTY_GREEN}*${TTY_WHITE} All sources are ready to be compiled.${TTY_RESET}
 install:
 	@echo ${TTY_BLUE}==\>${TTY_WHITE} Installing all binaries... ${TTY_RESET}
-	cd ${TOOLS_DIR}/${FFMPEG_TOOL} && make install
+	cd ${SRC_DIR}/${FFMPEG_TOOL} && make install
 	cp ${DIST_DIR}/bin/* /usr/bin/
 	
 message:
@@ -245,20 +259,19 @@ message:
 	@echo "---------------------------------------------------------------"
 	@echo
 
-cleanall:
-	@echo ${TTY_BLUE}==\>${TTY_WHITE} Removing all download sources ${TTY_RESET}
-	rm -rf ${PREFIX_DIR}/archives/*
-	rm -rf ${PREFIX_DIR}/libraries/*
-	rm -rf ${PREFIX_DIR}/tools/*
-	@$(call print_done)
-	
 clean:
 	@echo && echo ${TTY_BLUE}==\>${TTY_WHITE} Cleaning compiled directories ${TTY_RESET}
-	@for i in ${ALL_LIBS}; do cd ${LIB_DIR}/$$i && make clean && rm -f 'compile.done' && rm -f 'configure.done'; done
-	@for i in ${ALL_TOOLS}; do cd ${TOOLS_DIR}/$$i && make clean && rm -f 'compile.done' && rm -f 'configure.done'; done
-	@rm -rf ${PREFIX_DIR}/olibs/*
+	@for i in ${ALL_LIBS}; do cd ${SRC_DIR}/$$i && make clean && rm -f 'compile.done' && rm -f 'configure.done'; done
+	@for i in ${ALL_TOOLS}; do cd ${SRC_DIR}/$$i && make clean && rm -f 'compile.done' && rm -f 'configure.done'; done
+	@rm -rf ${RUNTIME_DIR}
 	@$(call print_done)
 
+distclean: clean
+	@echo ${TTY_BLUE}==\>${TTY_WHITE} Removing all download sources ${TTY_RESET}
+	rm -rf ${SRC_DIR}
+	rm -rf ${RUNTIME_DIR}
+	rm -rf ${DIST_DIR}
+	@$(call print_done)
 
 ### TODO
 # System check before compiling
