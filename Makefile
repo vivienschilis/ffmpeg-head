@@ -67,7 +67,10 @@ VPX_CODEC = libvpx
 X264_CODEC_URL = git://git.videolan.org/x264.git
 X264_CODEC = x264
 
-LIB_SOURCES = ${GSM_CODEC_URL} ${FAAC_CODEC_URL} ${FAAD2_CODEC_URL} ${LAME_CODEC_URL} ${OGG_CODEC_URL} ${VORBIS_CODEC_URL} ${XVID_CODEC_URL} ${AMR_CODEC_URL} ${THEORA_CODEC_URL} ${VPX_CODEC_URL} ${X264_CODEC_URL}
+YASM_TOOL_URL = http://www.tortall.net/projects/yasm/releases/yasm-1.1.0.tar.gz
+YASM_TOOL = yasm-1.1.0
+
+LIB_SOURCES = ${YASM_TOOL_URL} ${GSM_CODEC_URL} ${FAAC_CODEC_URL} ${FAAD2_CODEC_URL} ${LAME_CODEC_URL} ${OGG_CODEC_URL} ${VORBIS_CODEC_URL} ${XVID_CODEC_URL} ${AMR_CODEC_URL} ${THEORA_CODEC_URL} ${VPX_CODEC_URL} ${X264_CODEC_URL}
 
 # TOOLS SOURCES
 FFMPEG_TOOL = ffmpeg
@@ -148,7 +151,7 @@ init:
 
 yasm:
 	@$(call start_compiling_message, yasm)
-	cd ${SRC_DIR}/${YASM_TOOL} && if [ ! -f 'configure.done' ]; then ${CONFIGURE_STATUS}; else $(call prev_configured_message,yasm); fi && $(call m_and_mi,yasm);
+	@cd ${SRC_DIR}/${YASM_TOOL} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_AND_PREFIX}; else $(call prev_configured_message,yasm); fi && $(call m_and_mi,yasm);
 	@$(call end_compiling_message,yasm)
 
 faac: 
@@ -276,4 +279,3 @@ distclean: clean
 ### TODO
 # System check before compiling
 # Recommend home-brew for Mac OS
-# Force install yasm for libvpx
