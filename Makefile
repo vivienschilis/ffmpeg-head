@@ -100,8 +100,11 @@ ENABLED_FFMPEG_CODECS += --enable-libopencore-amrwb
 ENABLED_FFMPEG_CODECS += --enable-version3
 
 DISABLED_FFMPEG_TOOLS += --disable-ffplay
-DISABLED_FFMPEG_TOOLS += --disable-ffserver 
+DISABLED_FFMPEG_TOOLS += --disable-ffserver
 DISABLED_FFMPEG_TOOLS += --disable-ffprobe
+DISABLED_FFMPEG_TOOLS += --disable-network
+DISABLED_FFMPEG_TOOLS += --disable-devices
+DISABLED_FFMPEG_TOOLS += --disable-doc
 
 CONFIGURE_FFMPEG = ${CONFIGURE_STATIC} ${ENABLED_FFMPEG_CODECS} ${DISABLED_FFMPEG_TOOLS} --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --datadir=/usr/share/ffmpeg --bindir=${DIST_DIR}/bin --incdir=${DIST_DIR}/include --libdir=${DIST_DIR}/lib --prefix=/usr
 
@@ -272,7 +275,6 @@ clean:
 distclean: clean
 	@echo ${TTY_BLUE}==\>${TTY_WHITE} Removing all download sources ${TTY_RESET}
 	rm -rf ${SRC_DIR}
-	rm -rf ${RUNTIME_DIR}
 	rm -rf ${DIST_DIR}
 	@$(call print_done)
 
