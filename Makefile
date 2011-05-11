@@ -1,6 +1,7 @@
 UNAME := $(shell uname -s)
+REV := $(shell git rev-list HEAD | wc -l | sed 's/ *//g')
 
-all: init yasm faac gsm lame ogg theora vorbis vpx amr x264 xvid ffmpeg message
+all: init yasm faac gsm lame ogg theora vorbis vpx amr x264 xvid ffmpeg segmenter message
 
 TTY_WHITE = \\033[1\;39m
 TTY_BLUE = \\033[1\;34m
@@ -209,9 +210,11 @@ xvid:
 	@cd ${SRC_DIR}/${XVID_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC} ${XVID_CONFIGURE_ARGS}; else $(call prev_configured_message,xvid); fi && $(call m_and_mi,xvid);
 	@$(call end_compiling_message,xvid)
 
-ffmpeg: 
+ffmpeg: src/ffmpeg/configure.done
+src/ffmpeg/configure.done: .git/logs/HEAD
 	@$(call start_compiling_message,ffmpeg)
-	@cd ${SRC_DIR}/${FFMPEG_TOOL} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_FFMPEG}; else $(call prev_configured_message,ffmpeg); fi && $(call make_only,ffmpeg)
+	@cd ${SRC_DIR}/${FFMPEG_TOOL} && ${CONFIGURE_FFMPEG} && $(call m_and_mi,ffmpeg)
+	touch $@
 	@$(call end_compiling_message,ffmpeg)
 
 qtfs: 
@@ -230,7 +233,7 @@ segmenter:
 download_archive = sh ../fetch_url $1
 clone_from_svn = svn checkout $1
 
-bootstrap: init_bootstrap cleanall fetch
+bootstrap: distclean init_bootstrap fetch
 
 patch:
 	@echo ${TTY_BLUE}==\> ${TTY_WHITE}Patching ffmpeg $(1)... ${TTY_RESET}
@@ -272,7 +275,7 @@ clean:
 	@rm -rf ${RUNTIME_DIR}
 	@$(call print_done)
 
-distclean: clean
+distclean:
 	@echo ${TTY_BLUE}==\>${TTY_WHITE} Removing all download sources ${TTY_RESET}
 	rm -rf ${SRC_DIR}
 	rm -rf ${DIST_DIR}
