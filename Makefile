@@ -1,7 +1,7 @@
 UNAME := $(shell uname -s)
 REV := $(shell git rev-list HEAD | wc -l | sed 's/ *//g')
 
-all: init yasm faac gsm lame ogg theora vorbis vpx amr x264 xvid ffmpeg segmenter message
+all: init bzip2 zlib yasm faac gsm lame ogg theora vorbis vpx amr x264 xvid ffmpeg segmenter message
 
 TTY_WHITE = \\033[1\;39m
 TTY_BLUE = \\033[1\;34m
@@ -71,7 +71,13 @@ X264_CODEC = x264
 YASM_TOOL_URL = http://www.tortall.net/projects/yasm/releases/yasm-1.1.0.tar.gz
 YASM_TOOL = yasm-1.1.0
 
-LIB_SOURCES = ${YASM_TOOL_URL} ${GSM_CODEC_URL} ${FAAC_CODEC_URL} ${FAAD2_CODEC_URL} ${LAME_CODEC_URL} ${OGG_CODEC_URL} ${VORBIS_CODEC_URL} ${XVID_CODEC_URL} ${AMR_CODEC_URL} ${THEORA_CODEC_URL} ${VPX_CODEC_URL} ${X264_CODEC_URL}
+ZLIB_URL = http://zlib.net/zlib-1.2.5.tar.bz2
+ZLIB = zlib-1.2.5
+
+BZIP2_URL = http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz
+BZIP2 = bzip2-1.0.6
+
+LIB_SOURCES = ${BZIP2_URL} ${ZLIB_URL} ${YASM_TOOL_URL} ${GSM_CODEC_URL} ${FAAC_CODEC_URL} ${FAAD2_CODEC_URL} ${LAME_CODEC_URL} ${OGG_CODEC_URL} ${VORBIS_CODEC_URL} ${XVID_CODEC_URL} ${AMR_CODEC_URL} ${THEORA_CODEC_URL} ${VPX_CODEC_URL} ${X264_CODEC_URL}
 
 # TOOLS SOURCES
 FFMPEG_TOOL = ffmpeg
@@ -152,6 +158,20 @@ init:
 	mkdir -p ${RUNTIME_DIR}/man
 	mkdir -p ${RUNTIME_DIR}/man/man3
 	@$(call print_done)
+
+bzip2:
+	@$(call start_compiling_message, bzip2)
+	cd ${SRC_DIR}/${BZIP2} && touch configure.done ; make && make install -n PREFIX=${RUNTIME_DIR};
+	@$(call end_compiling_message, bzip2)
+
+
+zlib:
+	@$(call start_compiling_message, zlib)
+	@cd ${SRC_DIR}/${ZLIB} && if [ ! -f 'configure.done'  ]; then ./configure --prefix=${RUNTIME_DIR} --static ; else $(call prev_configured_message,zlib); fi
+	@cd ${SRC_DIR}/${ZLIB} && grep -v -E 'cp.*SHAREDLIBV' Makefile > Makefile.new; mv Makefile.new Makefile
+	@cd ${SRC_DIR}/${ZLIB} && $(call m_and_mi,zlib);
+	@$(call end_compiling_message, zlib)
+
 
 yasm:
 	@$(call start_compiling_message, yasm)
@@ -278,6 +298,7 @@ clean:
 distclean:
 	@echo ${TTY_BLUE}==\>${TTY_WHITE} Removing all download sources ${TTY_RESET}
 	rm -rf ${SRC_DIR}
+	rm -rf ${RUNTIME_DIR}
 	rm -rf ${DIST_DIR}
 	@$(call print_done)
 
