@@ -110,9 +110,8 @@ if [ "$CACHE" -eq 0 ] || [ ! -e "$cache_file" ]; then
 
   sh mv -f "$tmp_file" "$cache_file"
 elif [ "$scheme" = "git" ]; then
-  pushd $cache_file
-  git fetch
-  popd
+  sh cd $cache_file
+  sh git fetch
 fi
 
 # TODO: checksums
