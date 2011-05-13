@@ -106,6 +106,10 @@ ENABLED_FFMPEG_CODECS += --enable-libopencore-amrnb
 ENABLED_FFMPEG_CODECS += --enable-libopencore-amrwb
 ENABLED_FFMPEG_CODECS += --enable-version3
 
+# ENABLED_FFMPEG_CODECS += --enable-libdirac
+# ENABLED_FFMPEG_CODECS += --enable-libvo-aacenc
+# ENABLED_FFMPEG_CODECS += --enable-libvo-amrwbenc
+
 DISABLED_FFMPEG_TOOLS += --disable-ffplay
 DISABLED_FFMPEG_TOOLS += --disable-ffserver
 DISABLED_FFMPEG_TOOLS += --disable-ffprobe
