@@ -272,9 +272,11 @@ fetch:
 	@for i in ${TOOLS_SOURCES}; do cd ${SRC_DIR} && $(call download_archive,$$i) && $(call print_done) && echo; done
 	
 	@echo ${TTY_GREEN}*${TTY_WHITE} All sources are ready to be compiled.${TTY_RESET}
+
 install:
 	@echo ${TTY_BLUE}==\>${TTY_WHITE} Installing all binaries... ${TTY_RESET}
-	cp ${DIST_DIR}/bin/* /usr/bin/
+	@mkdir -p "${PREFIX_DIR}/bin"
+	@cp ${DIST_DIR}/bin/* ${PREFIX_DIR}/bin
 	
 message:
 	@echo
