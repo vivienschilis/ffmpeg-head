@@ -151,6 +151,8 @@ else \
         echo ${TTY_GREEN}* ${TTY_WHITE}$(1) previously compiled. ${TTY_RESET}; \
 fi
 
+m_and_mi_ffmpeg = $(call make_only) && cp ${SRC_DIR}/${FFMPEG_TOOL}/ffmpeg ${RUNTIME_DIR}/bin
+
 init:
 	@echo ${TTY_BLUE}==\> ${TTY_WHITE}Creating directories... ${TTY_RESET}
 	mkdir -p ${SRC_DIR}
@@ -234,11 +236,9 @@ xvid:
 	@cd ${SRC_DIR}/${XVID_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC} ${XVID_CONFIGURE_ARGS}; else $(call prev_configured_message,xvid); fi && $(call m_and_mi,xvid);
 	@$(call end_compiling_message,xvid)
 
-ffmpeg: src/ffmpeg/configure.done
-src/ffmpeg/configure.done: .git/logs/HEAD
+ffmpeg: 
 	@$(call start_compiling_message,ffmpeg)
-	@cd ${SRC_DIR}/${FFMPEG_TOOL} && ${CONFIGURE_FFMPEG} && $(call m_and_mi,ffmpeg)
-	touch $@
+	@cd ${SRC_DIR}/${FFMPEG_TOOL} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_FFMPEG}; else $(call prev_configured_message,ffmpeg); fi && $(call m_and_mi_ffmpeg);
 	@$(call end_compiling_message,ffmpeg)
 
 qtfs: 
@@ -281,7 +281,6 @@ fetch:
 	@echo ${TTY_GREEN}*${TTY_WHITE} All sources are ready to be compiled.${TTY_RESET}
 install:
 	@echo ${TTY_BLUE}==\>${TTY_WHITE} Installing all binaries... ${TTY_RESET}
-	cd ${SRC_DIR}/${FFMPEG_TOOL} && make install
 	cp ${DIST_DIR}/bin/* /usr/bin/
 	
 message:
