@@ -14,6 +14,7 @@ SRC_DIR = ${TOP}/src
 RUNTIME_DIR = ${TOP}/runtime
 DIST_DIR = ${TOP}/dist
 PATCH_DIR = ${TOP}/patches
+PREFIX_DIR ?= /usr/local
 
 ${SRC_DIR}:
 	mkdir -p $@
@@ -117,7 +118,7 @@ DISABLED_FFMPEG_TOOLS += --disable-network
 DISABLED_FFMPEG_TOOLS += --disable-devices
 DISABLED_FFMPEG_TOOLS += --disable-doc
 
-CONFIGURE_FFMPEG = ${CONFIGURE_STATIC} ${ENABLED_FFMPEG_CODECS} ${DISABLED_FFMPEG_TOOLS} --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --bindir=${DIST_DIR}/bin --incdir=${DIST_DIR}/include --libdir=${DIST_DIR}/lib --prefix=/usr
+CONFIGURE_FFMPEG = ${CONFIGURE_STATIC} ${ENABLED_FFMPEG_CODECS} ${DISABLED_FFMPEG_TOOLS} --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --bindir=${DIST_DIR}/bin --incdir=${DIST_DIR}/include --libdir=${DIST_DIR}/lib --prefix=${PREFIX_DIR}
 
 ALL_LIBS = ${FAAC_CODEC} ${GSM_CODEC} ${LAME_CODEC} ${OGG_CODEC} ${THEORA_CODEC} ${VORBIS_CODEC} ${VPX_CODEC} ${AMR_CODEC} ${X264_CODEC} ${XVID_CODEC}
 ALL_TOOLS = ${FFMPEG_TOOL} ${SEGMENTER_TOOL}
