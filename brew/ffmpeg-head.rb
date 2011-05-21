@@ -1,6 +1,6 @@
 require 'formula'
 
-class FfmpegStatic < Formula
+class FfmpegHead < Formula
   head 'git://github.com/vivienschilis/ffmpeg-head.git', :using => :git
   
   def install
