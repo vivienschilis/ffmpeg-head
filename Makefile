@@ -117,7 +117,7 @@ DISABLED_FFMPEG_TOOLS += --disable-network
 DISABLED_FFMPEG_TOOLS += --disable-devices
 DISABLED_FFMPEG_TOOLS += --disable-doc
 
-CONFIGURE_FFMPEG = ${CONFIGURE_STATIC} ${ENABLED_FFMPEG_CODECS} ${DISABLED_FFMPEG_TOOLS} --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --datadir=/usr/share/ffmpeg --bindir=${DIST_DIR}/bin --incdir=${DIST_DIR}/include --libdir=${DIST_DIR}/lib --prefix=/usr
+CONFIGURE_FFMPEG = ${CONFIGURE_STATIC} ${ENABLED_FFMPEG_CODECS} ${DISABLED_FFMPEG_TOOLS} --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --bindir=${DIST_DIR}/bin --incdir=${DIST_DIR}/include --libdir=${DIST_DIR}/lib --prefix=/usr
 
 ALL_LIBS = ${FAAC_CODEC} ${GSM_CODEC} ${LAME_CODEC} ${OGG_CODEC} ${THEORA_CODEC} ${VORBIS_CODEC} ${VPX_CODEC} ${AMR_CODEC} ${X264_CODEC} ${XVID_CODEC}
 ALL_TOOLS = ${FFMPEG_TOOL} ${SEGMENTER_TOOL}
@@ -144,14 +144,6 @@ m_and_mi = touch 'configure.done' && if [ ! -f 'compile.done' ]; then \
 else \
 	echo ${TTY_GREEN}* ${TTY_WHITE}$(1) previously compiled. ${TTY_RESET}; \
 fi 
-
-make_only = touch 'configure.done' && if [ ! -f 'compile.done' ]; then \
-        make -j 4 && touch 'compile.done'; \
-else \
-        echo ${TTY_GREEN}* ${TTY_WHITE}$(1) previously compiled. ${TTY_RESET}; \
-fi
-
-m_and_mi_ffmpeg = $(call make_only) && cp ${SRC_DIR}/${FFMPEG_TOOL}/ffmpeg ${RUNTIME_DIR}/bin
 
 init:
 	@echo ${TTY_BLUE}==\> ${TTY_WHITE}Creating directories... ${TTY_RESET}
@@ -238,7 +230,7 @@ xvid:
 
 ffmpeg: 
 	@$(call start_compiling_message,ffmpeg)
-	@cd ${SRC_DIR}/${FFMPEG_TOOL} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_FFMPEG}; else $(call prev_configured_message,ffmpeg); fi && $(call m_and_mi_ffmpeg);
+	@cd ${SRC_DIR}/${FFMPEG_TOOL} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_FFMPEG}; else $(call prev_configured_message,ffmpeg); fi && $(call m_and_mi,ffmpeg);
 	@$(call end_compiling_message,ffmpeg)
 
 qtfs: 
