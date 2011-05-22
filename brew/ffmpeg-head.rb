@@ -9,6 +9,6 @@ class FfmpegHead < Formula
     
     system 'make bootstrap'
     system "make"
-    system "cp dist/bin/* #{prefix}/bin"
+    system "make install"
   end  
 end
