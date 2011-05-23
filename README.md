@@ -38,3 +38,7 @@ Clean all libraries
 Clean all environment
 
     make cleanall
+    
+Brew 
+    curl 'https://github.com/vivienschilis/ffmpeg-head/raw/master/brew/ffmpeg-head.rb' -o /usr/local/Library/Formula/ffmpeg-head.rb
+    brew install ffmpeg-head
