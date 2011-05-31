@@ -182,9 +182,11 @@ yasm:
 	@cd ${SRC_DIR}/${YASM_TOOL} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_AND_PREFIX}; else $(call prev_configured_message,yasm); fi && $(call m_and_mi,yasm);
 	@$(call end_compiling_message,yasm)
 
-faac: 
+faac:
 	@$(call start_compiling_message, faac)
-	@cd ${SRC_DIR}/${FAAC_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,faac); fi && $(call m_and_mi,faac);
+	@cd ${SRC_DIR}/${FAAC_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,faac); fi
+	@cd ${SRC_DIR}/${FAAC_CODEC} && sed -i -e "s|^char \*strcasestr.*|//\0|" common/mp4v2/mpeg4ip.h
+	@cd ${SRC_DIR}/${FAAC_CODEC} && $(call m_and_mi,faac);
 	@$(call end_compiling_message,faac)
 
 gsm: 
