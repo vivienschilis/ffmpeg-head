@@ -90,6 +90,11 @@ TOOLS_SOURCES = ${FFMPEG_TOOL_URL} ${SEGMENTER_TOOL_URL}
 
 
 # FFMPEG FLAGS
+FFMPEG_CFLAGS=--static
+FFMPEG_LDFLAGS=
+
+FFMPEG_FEATURES += --enable-pthreads
+FFMPEG_FEATURES += --enable-runtime-cpudetect
 
 ENABLED_FFMPEG_CODECS += --enable-postproc
 ENABLED_FFMPEG_CODECS += --enable-nonfree
