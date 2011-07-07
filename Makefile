@@ -1,7 +1,7 @@
 UNAME := $(shell uname -s)
 REV := $(shell git rev-list HEAD | wc -l | sed 's/ *//g')
 
-all: init bzip2 zlib yasm faac gsm lame ogg theora vorbis vpx amr x264 xvid ffmpeg segmenter message
+all: init bzip2 zlib yasm faac gsm lame ogg vorbis theora vpx amr x264 xvid ffmpeg segmenter message
 
 TTY_WHITE = \\033[1\;39m
 TTY_BLUE = \\033[1\;34m
@@ -199,15 +199,15 @@ ogg:
 	@cd ${SRC_DIR}/${OGG_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,ogg); fi && $(call m_and_mi,ogg);
 	@$(call end_compiling_message,ogg)
 
-theora: 
-	@$(call start_compiling_message,theora)
-	@cd ${SRC_DIR}/${THEORA_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,theora); fi && $(call m_and_mi,theora);
-	@$(call end_compiling_message,theora)
-
 vorbis: 
 	@$(call start_compiling_message, vorbis)
 	@cd ${SRC_DIR}/${VORBIS_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,vorbis); fi && $(call m_and_mi,vorbis);
 	@$(call end_compiling_message,vorbis)
+
+theora: 
+	@$(call start_compiling_message,theora)
+	@cd ${SRC_DIR}/${THEORA_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC} --with-ogg-libraries=${RUNTIME_DIR}/lib --with-ogg-includes=/${RUNTIME_DIR}/includes --with-vorbis-libraries=${RUNTIME_DIR}/lib --with-vorbis-includes=/${RUNTIME_DIR}/includes; else $(call prev_configured_message,theora); fi && $(call m_and_mi,theora);
+	@$(call end_compiling_message,theora)
 
 vpx: 
 	@$(call start_compiling_message,vpx)
