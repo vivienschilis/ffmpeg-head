@@ -10,6 +10,8 @@ class FfmpegHead < Formula
     
     system 'make bootstrap'
     system "make"
+    system "make qtfs"
+    system "make segmenter"
     system "make install"
   end  
 end
