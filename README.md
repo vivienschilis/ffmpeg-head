@@ -41,5 +41,5 @@ Clean all environment
     
 Brew 
 
-    curl 'https://github.com/vivienschilis/ffmpeg-head/raw/master/brew/ffmpeg-head.rb' -o /usr/local/Library/Formula/ffmpeg-head.rb
+    curl 'https://raw.github.com/vivienschilis/ffmpeg-head/master/brew/ffmpeg-head.rb' -o /usr/local/Library/Formula/ffmpeg-head.rb
     brew install ffmpeg-head
