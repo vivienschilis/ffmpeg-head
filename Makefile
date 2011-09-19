@@ -63,7 +63,7 @@ AMR_CODEC = opencore-amr-0.1.2
 THEORA_CODEC_URL = http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2
 THEORA_CODEC = libtheora-1.1.1
 
-VPX_CODEC_URL = git://review.webmproject.org/libvpx.git
+VPX_CODEC_URL = http://git.chromium.org/webm/libvpx.git
 VPX_CODEC = libvpx
 
 X264_CODEC_URL = git://git.videolan.org/x264.git
@@ -123,7 +123,7 @@ DISABLED_FFMPEG_TOOLS += --disable-network
 DISABLED_FFMPEG_TOOLS += --disable-devices
 DISABLED_FFMPEG_TOOLS += --disable-doc
 
-CONFIGURE_FFMPEG = ${CONFIGURE_STATIC} ${ENABLED_FFMPEG_CODECS} ${DISABLED_FFMPEG_TOOLS} --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --bindir=${DIST_DIR}/bin --incdir=${DIST_DIR}/include --libdir=${DIST_DIR}/lib --prefix=${PREFIX_DIR}
+CONFIGURE_FFMPEG = ${CONFIGURE_STATIC} ${ENABLED_FFMPEG_CODECS} ${DISABLED_FFMPEG_TOOLS}  --cc=clang --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --bindir=${DIST_DIR}/bin --incdir=${DIST_DIR}/include --libdir=${DIST_DIR}/lib --prefix=${PREFIX_DIR}
 
 ALL_LIBS = ${FAAC_CODEC} ${GSM_CODEC} ${LAME_CODEC} ${OGG_CODEC} ${THEORA_CODEC} ${VORBIS_CODEC} ${VPX_CODEC} ${AMR_CODEC} ${X264_CODEC} ${XVID_CODEC}
 ALL_TOOLS = ${FFMPEG_TOOL} ${SEGMENTER_TOOL}
