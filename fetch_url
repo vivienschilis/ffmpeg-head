@@ -66,7 +66,12 @@ fetch_from_svn() {
 }
 
 extract_scheme() {
-  echo "$1" | awk '{split($0,a,"://"); print a[1]}'
+  extname=`echo "$1" | awk -F . '{print $NF}'`
+  if [ "$extname" = "git" ]; then
+    echo "git"
+  else
+    echo "$1" | awk '{split($0,a,"://"); print a[1]}'
+  fi
 }
 
 if [ -z "$URL" ]; then
