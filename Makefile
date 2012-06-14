@@ -128,9 +128,14 @@ CONFIGURE_FFMPEG = ${CONFIGURE_STATIC} ${ENABLED_FFMPEG_CODECS} ${DISABLED_FFMPE
 ALL_LIBS = ${FAAC_CODEC} ${GSM_CODEC} ${LAME_CODEC} ${OGG_CODEC} ${THEORA_CODEC} ${VORBIS_CODEC} ${VPX_CODEC} ${AMR_CODEC} ${X264_CODEC} ${XVID_CODEC}
 ALL_TOOLS = ${FFMPEG_TOOL} ${SEGMENTER_TOOL}
 
-SEGMENTER_GCC = gcc -I${DIST_DIR}/include -o segmenter segmenter.c  -lm -lz -lbz2 -lpthread \
-${DIST_DIR}/lib/libswscale.a ${DIST_DIR}/lib/libavdevice.a ${DIST_DIR}/lib/libavformat.a  ${DIST_DIR}/lib/libavcodec.a  ${DIST_DIR}/lib/libavutil.a  ${DIST_DIR}/lib/libavfilter.a  ${RUNTIME_DIR}/lib/libvorbisfile.a ${RUNTIME_DIR}/lib/libfaac.a  ${RUNTIME_DIR}/lib/libtheora.a  ${RUNTIME_DIR}/lib/libvpx.a ${RUNTIME_DIR}/lib/libgsm.a ${RUNTIME_DIR}/lib/libopencore-amrnb.a ${RUNTIME_DIR}/lib/libtheoradec.a  ${RUNTIME_DIR}/lib/libvorbisenc.a ${RUNTIME_DIR}/lib/libx264.a ${RUNTIME_DIR}/lib/libmp3lame.a  ${RUNTIME_DIR}/lib/libopencore-amrwb.a ${RUNTIME_DIR}/lib/libtheoraenc.a  ${RUNTIME_DIR}/lib/libxvidcore.a ${RUNTIME_DIR}/lib/libogg.a ${RUNTIME_DIR}/lib/libvorbis.a
+UNAME := $(shell uname)
 
+ifeq ($(UNAME), Darwin)
+CF_LIB = -framework CoreFoundation -framework VideoDecodeAcceleration -framework QuartzCore
+endif
+
+SEGMENTER_GCC = gcc -I${DIST_DIR}/include -o segmenter segmenter.c ${CF_LIB} -lm -lz -lbz2 -lpthread \
+${DIST_DIR}/lib/libswresample.a ${DIST_DIR}/lib/libswscale.a ${DIST_DIR}/lib/libavdevice.a ${DIST_DIR}/lib/libavformat.a  ${DIST_DIR}/lib/libavcodec.a  ${DIST_DIR}/lib/libavutil.a  ${DIST_DIR}/lib/libavfilter.a  ${RUNTIME_DIR}/lib/libvorbisfile.a ${RUNTIME_DIR}/lib/libfaac.a  ${RUNTIME_DIR}/lib/libtheora.a  ${RUNTIME_DIR}/lib/libvpx.a ${RUNTIME_DIR}/lib/libgsm.a ${RUNTIME_DIR}/lib/libopencore-amrnb.a ${RUNTIME_DIR}/lib/libtheoradec.a  ${RUNTIME_DIR}/lib/libvorbisenc.a ${RUNTIME_DIR}/lib/libx264.a ${RUNTIME_DIR}/lib/libmp3lame.a  ${RUNTIME_DIR}/lib/libopencore-amrwb.a ${RUNTIME_DIR}/lib/libtheoraenc.a  ${RUNTIME_DIR}/lib/libxvidcore.a ${RUNTIME_DIR}/lib/libogg.a ${RUNTIME_DIR}/lib/libvorbis.a
 
 # Helper methods
 print_done = \
