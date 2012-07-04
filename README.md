@@ -41,4 +41,4 @@ Clean all environment
     
 Brew 
 
-    brew install https://raw.github.com/vivienschilis/ffmpeg-head/master/brew/ffmpeg.rbn --HEAD
+    brew install https://raw.github.com/vivienschilis/ffmpeg-head/master/brew/ffmpeg.rb --HEAD
