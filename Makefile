@@ -118,7 +118,7 @@ ENABLED_FFMPEG_CODECS += --enable-version3
 
 DISABLED_FFMPEG_TOOLS += --disable-ffplay
 DISABLED_FFMPEG_TOOLS += --disable-ffserver
-DISABLED_FFMPEG_TOOLS += --disable-ffprobe
+#DISABLED_FFMPEG_TOOLS += --disable-ffprobe
 DISABLED_FFMPEG_TOOLS += --disable-network
 DISABLED_FFMPEG_TOOLS += --disable-devices
 DISABLED_FFMPEG_TOOLS += --disable-doc
