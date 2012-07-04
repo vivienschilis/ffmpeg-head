@@ -1,6 +1,6 @@
 require 'formula'
 
-class FfmpegHead < Formula
+class Ffmpeg < Formula
   head 'git://github.com/vivienschilis/ffmpeg-head.git', :using => :git
   homepage 'https://github.com/vivienschilis/ffmpeg-head'
   
