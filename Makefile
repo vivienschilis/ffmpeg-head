@@ -1,7 +1,7 @@
 UNAME := $(shell uname -s)
 REV := $(shell git rev-list HEAD | wc -l | sed 's/ *//g')
 
-all: init bzip2 zlib yasm faac gsm lame ogg vorbis theora vpx amr x264 xvid ffmpeg segmenter message
+all: init bzip2 zlib yasm faac gsm lame ogg vorbis theora vpx amr x264 fdk_aac opus xvid ffmpeg segmenter message
 
 TTY_WHITE = \\033[1\;39m
 TTY_BLUE = \\033[1\;34m
@@ -69,6 +69,9 @@ VPX_CODEC = libvpx
 FDK_AAC_CODEC_URL=http://downloads.sourceforge.net/opencore-amr/fdk-aac-0.1.0.tar.gz
 FDK_AAC_CODEC = fdk-aac-0.1.0
 
+OPUS_CODEC_URL=http://downloads.xiph.org/releases/opus/opus-1.0.1.tar.gz
+OPUS_CODEC = opus-1.0.1
+
 X264_CODEC_URL = git://git.videolan.org/x264.git
 X264_CODEC = x264
 
@@ -81,7 +84,7 @@ ZLIB = zlib-1.2.7
 BZIP2_URL = http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz
 BZIP2 = bzip2-1.0.6
 
-LIB_SOURCES = ${BZIP2_URL} ${ZLIB_URL} ${YASM_TOOL_URL} ${GSM_CODEC_URL} ${FAAC_CODEC_URL} ${FAAD2_CODEC_URL} ${LAME_CODEC_URL} ${OGG_CODEC_URL} ${VORBIS_CODEC_URL} ${XVID_CODEC_URL} ${AMR_CODEC_URL} ${THEORA_CODEC_URL} ${VPX_CODEC_URL} ${FDK_AAC_CODEC_URL} ${X264_CODEC_URL}
+LIB_SOURCES = ${BZIP2_URL} ${ZLIB_URL} ${YASM_TOOL_URL} ${GSM_CODEC_URL} ${FAAC_CODEC_URL} ${FAAD2_CODEC_URL} ${LAME_CODEC_URL} ${OGG_CODEC_URL} ${VORBIS_CODEC_URL} ${XVID_CODEC_URL} ${AMR_CODEC_URL} ${THEORA_CODEC_URL} ${VPX_CODEC_URL} ${OPUS_CODEC_URL} ${FDK_AAC_CODEC_URL} ${X264_CODEC_URL}
 
 # TOOLS SOURCES
 FFMPEG_TOOL = ffmpeg
@@ -115,6 +118,7 @@ ENABLED_FFMPEG_CODECS += --enable-libopencore-amrnb
 ENABLED_FFMPEG_CODECS += --enable-libopencore-amrwb
 ENABLED_FFMPEG_CODECS += --enable-libfdk-aac
 ENABLED_FFMPEG_CODECS += --enable-version3
+#ENABLED_FFMPEG_CODECS += --enable-libopus
 
 # ENABLED_FFMPEG_CODECS += --enable-libdirac
 # ENABLED_FFMPEG_CODECS += --enable-libvo-aacenc
@@ -129,8 +133,7 @@ DISABLED_FFMPEG_TOOLS += --disable-doc
 
 CONFIGURE_FFMPEG = ${CONFIGURE_STATIC} ${ENABLED_FFMPEG_CODECS} ${DISABLED_FFMPEG_TOOLS}  --cc=clang --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --bindir=${DIST_DIR}/bin --incdir=${DIST_DIR}/include --libdir=${DIST_DIR}/lib --prefix=${PREFIX_DIR}
 
-ALL_LIBS = ${FAAC_CODEC} ${GSM_CODEC} ${LAME_CODEC} ${OGG_CODEC} ${THEORA_CODEC} ${VORBIS_CODEC} ${VPX_CODEC} ${AMR_CODEC} ${X264_CODEC} ${XVID_CODEC} ${X264_CODEC}
-ALL_TOOLS = ${FFMPEG_TOOL} ${SEGMENTER_TOOL}
+ALL_LIBS = ${FAAC_CODEC} ${GSM_CODEC} ${LAME_CODEC} ${OGG_CODEC} ${THEORA_CODEC} ${VORBIS_CODEC} ${VPX_CODEC} ${AMR_CODEC} ${X264_CODEC} ${XVID_CODEC} ${X264_CODEC} ${FFMPEG_TOOL} ${SEGMENTER_TOOL}
 
 UNAME := $(shell uname)
 
@@ -234,13 +237,18 @@ amr:
 	@$(call start_compiling_message,amr)
 	@cd ${SRC_DIR}/${AMR_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,amr); fi && $(call m_and_mi,amr);
 	@$(call end_compiling_message,amr)
+
+opus:
+	@$(call start_compiling_message,opus)
+	@cd ${SRC_DIR}/${OPUS_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,opus); fi && $(call m_and_mi,opus);
+	@$(call end_compiling_message,opus)
 	
 fdk_aac:
 	@$(call start_compiling_message,fdk_aac)
 	@cd ${SRC_DIR}/${FDK_AAC_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,fdk_aac); fi && $(call m_and_mi,fdk_aac);
 	@$(call end_compiling_message,fdk_aac)
 
-x264: 
+x264:
 	@$(call start_compiling_message,x264)
 	@cd ${SRC_DIR}/${X264_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,x264); fi && $(call m_and_mi,x264);
 	@$(call end_compiling_message,x264)
@@ -310,7 +318,6 @@ message:
 clean:
 	@echo && echo ${TTY_BLUE}==\>${TTY_WHITE} Cleaning compiled directories ${TTY_RESET}
 	@for i in ${ALL_LIBS}; do cd ${SRC_DIR}/$$i && make clean && rm -f 'compile.done' && rm -f 'configure.done'; done
-	@for i in ${ALL_TOOLS}; do cd ${SRC_DIR}/$$i && make clean && rm -f 'compile.done' && rm -f 'configure.done'; done
 	@rm -rf ${RUNTIME_DIR}
 	@$(call print_done)
 
