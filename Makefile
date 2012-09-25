@@ -36,7 +36,7 @@ CONFIGURE_STATIC = ${CONFIGURE_AND_PREFIX} --enable-static --disable-shared
 # URL TO DOWNLOAD ALL CODECS ARCHIVES
 
 # LIB SOURCES
-GSM_CODEC_URL = http://www.finalmediaplayer.com/downloads/3rdparty/libgsm_1.0.13.orig.tar.gz
+GSM_CODEC_URL = http://osxwinebuilder.googlecode.com/files/gsm-1.0.13.tar.gz
 GSM_CODEC = gsm-1.0-pl13
 
 FAAC_CODEC_URL = http://downloads.sourceforge.net/faac/faac-1.28.tar.gz
@@ -66,6 +66,9 @@ THEORA_CODEC = libtheora-1.1.1
 VPX_CODEC_URL = http://git.chromium.org/webm/libvpx.git
 VPX_CODEC = libvpx
 
+FDK_AAC_CODEC_URL=http://downloads.sourceforge.net/opencore-amr/fdk-aac-0.1.0.tar.gz
+FDK_AAC_CODEC = fdk-aac-0.1.0
+
 X264_CODEC_URL = git://git.videolan.org/x264.git
 X264_CODEC = x264
 
@@ -78,7 +81,7 @@ ZLIB = zlib-1.2.7
 BZIP2_URL = http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz
 BZIP2 = bzip2-1.0.6
 
-LIB_SOURCES = ${BZIP2_URL} ${ZLIB_URL} ${YASM_TOOL_URL} ${GSM_CODEC_URL} ${FAAC_CODEC_URL} ${FAAD2_CODEC_URL} ${LAME_CODEC_URL} ${OGG_CODEC_URL} ${VORBIS_CODEC_URL} ${XVID_CODEC_URL} ${AMR_CODEC_URL} ${THEORA_CODEC_URL} ${VPX_CODEC_URL} ${X264_CODEC_URL}
+LIB_SOURCES = ${BZIP2_URL} ${ZLIB_URL} ${YASM_TOOL_URL} ${GSM_CODEC_URL} ${FAAC_CODEC_URL} ${FAAD2_CODEC_URL} ${LAME_CODEC_URL} ${OGG_CODEC_URL} ${VORBIS_CODEC_URL} ${XVID_CODEC_URL} ${AMR_CODEC_URL} ${THEORA_CODEC_URL} ${VPX_CODEC_URL} ${FDK_AAC_CODEC_URL} ${X264_CODEC_URL}
 
 # TOOLS SOURCES
 FFMPEG_TOOL = ffmpeg
@@ -110,6 +113,7 @@ ENABLED_FFMPEG_CODECS += --enable-libvpx
 ENABLED_FFMPEG_CODECS += --enable-avfilter
 ENABLED_FFMPEG_CODECS += --enable-libopencore-amrnb
 ENABLED_FFMPEG_CODECS += --enable-libopencore-amrwb
+ENABLED_FFMPEG_CODECS += --enable-libfdk-aac
 ENABLED_FFMPEG_CODECS += --enable-version3
 
 # ENABLED_FFMPEG_CODECS += --enable-libdirac
@@ -125,7 +129,7 @@ DISABLED_FFMPEG_TOOLS += --disable-doc
 
 CONFIGURE_FFMPEG = ${CONFIGURE_STATIC} ${ENABLED_FFMPEG_CODECS} ${DISABLED_FFMPEG_TOOLS}  --cc=clang --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --bindir=${DIST_DIR}/bin --incdir=${DIST_DIR}/include --libdir=${DIST_DIR}/lib --prefix=${PREFIX_DIR}
 
-ALL_LIBS = ${FAAC_CODEC} ${GSM_CODEC} ${LAME_CODEC} ${OGG_CODEC} ${THEORA_CODEC} ${VORBIS_CODEC} ${VPX_CODEC} ${AMR_CODEC} ${X264_CODEC} ${XVID_CODEC}
+ALL_LIBS = ${FAAC_CODEC} ${GSM_CODEC} ${LAME_CODEC} ${OGG_CODEC} ${THEORA_CODEC} ${VORBIS_CODEC} ${VPX_CODEC} ${AMR_CODEC} ${X264_CODEC} ${XVID_CODEC} ${X264_CODEC}
 ALL_TOOLS = ${FFMPEG_TOOL} ${SEGMENTER_TOOL}
 
 UNAME := $(shell uname)
@@ -231,6 +235,11 @@ amr:
 	@cd ${SRC_DIR}/${AMR_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,amr); fi && $(call m_and_mi,amr);
 	@$(call end_compiling_message,amr)
 	
+fdk_aac:
+	@$(call start_compiling_message,fdk_aac)
+	@cd ${SRC_DIR}/${FDK_AAC_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,fdk_aac); fi && $(call m_and_mi,fdk_aac);
+	@$(call end_compiling_message,fdk_aac)
+
 x264: 
 	@$(call start_compiling_message,x264)
 	@cd ${SRC_DIR}/${X264_CODEC} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_STATIC}; else $(call prev_configured_message,x264); fi && $(call m_and_mi,x264);
