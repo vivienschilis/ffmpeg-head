@@ -29,8 +29,9 @@ ${DIST_DIR}:
 export LDFLAGS=-L${RUNTIME_DIR}/lib
 export CFLAGS=-I${RUNTIME_DIR}/include
 export PATH:=${DIST_DIR}/bin:${RUNTIME_DIR}/bin:${PATH}
+export PKG_CONFIG_PATH:=${RUNTIME_DIR}/lib/pkgconfig
 
-CONFIGURE_AND_PREFIX = ./configure --prefix=${RUNTIME_DIR}
+CONFIGURE_AND_PREFIX =  ./configure --prefix=${RUNTIME_DIR}
 CONFIGURE_STATIC = ${CONFIGURE_AND_PREFIX} --enable-static --disable-shared
 
 # URL TO DOWNLOAD ALL CODECS ARCHIVES
@@ -118,7 +119,7 @@ ENABLED_FFMPEG_CODECS += --enable-libopencore-amrnb
 ENABLED_FFMPEG_CODECS += --enable-libopencore-amrwb
 ENABLED_FFMPEG_CODECS += --enable-libfdk-aac
 ENABLED_FFMPEG_CODECS += --enable-version3
-#ENABLED_FFMPEG_CODECS += --enable-libopus
+ENABLED_FFMPEG_CODECS += --enable-libopus
 
 # ENABLED_FFMPEG_CODECS += --enable-libdirac
 # ENABLED_FFMPEG_CODECS += --enable-libvo-aacenc
@@ -142,7 +143,7 @@ CF_LIB = -framework CoreFoundation -framework VideoDecodeAcceleration -framework
 endif
 
 SEGMENTER_GCC = gcc -I${DIST_DIR}/include -o segmenter segmenter.c ${CF_LIB} -lm -lz -lbz2 -lpthread \
-${DIST_DIR}/lib/libswresample.a ${DIST_DIR}/lib/libswscale.a ${DIST_DIR}/lib/libavdevice.a ${DIST_DIR}/lib/libavformat.a  ${DIST_DIR}/lib/libavcodec.a  ${DIST_DIR}/lib/libavutil.a  ${DIST_DIR}/lib/libavfilter.a  ${RUNTIME_DIR}/lib/libvorbisfile.a ${RUNTIME_DIR}/lib/libfaac.a  ${RUNTIME_DIR}/lib/libtheora.a  ${RUNTIME_DIR}/lib/libvpx.a ${RUNTIME_DIR}/lib/libgsm.a ${RUNTIME_DIR}/lib/libopencore-amrnb.a ${RUNTIME_DIR}/lib/libtheoradec.a  ${RUNTIME_DIR}/lib/libvorbisenc.a ${RUNTIME_DIR}/lib/libx264.a ${RUNTIME_DIR}/lib/libmp3lame.a  ${RUNTIME_DIR}/lib/libopencore-amrwb.a ${RUNTIME_DIR}/lib/libtheoraenc.a  ${RUNTIME_DIR}/lib/libxvidcore.a ${RUNTIME_DIR}/lib/libogg.a ${RUNTIME_DIR}/lib/libvorbis.a
+${DIST_DIR}/lib/libswresample.a ${DIST_DIR}/lib/libswscale.a ${DIST_DIR}/lib/libavdevice.a ${DIST_DIR}/lib/libavformat.a  ${DIST_DIR}/lib/libavcodec.a  ${DIST_DIR}/lib/libavutil.a  ${DIST_DIR}/lib/libavfilter.a  ${RUNTIME_DIR}/lib/libvorbisfile.a ${RUNTIME_DIR}/lib/libfaac.a  ${RUNTIME_DIR}/lib/libtheora.a  ${RUNTIME_DIR}/lib/libvpx.a ${RUNTIME_DIR}/lib/libgsm.a ${RUNTIME_DIR}/lib/libopencore-amrnb.a ${RUNTIME_DIR}/lib/libtheoradec.a  ${RUNTIME_DIR}/lib/libvorbisenc.a ${RUNTIME_DIR}/lib/libx264.a ${RUNTIME_DIR}/lib/libmp3lame.a  ${RUNTIME_DIR}/lib/libopencore-amrwb.a ${RUNTIME_DIR}/lib/libtheoraenc.a  ${RUNTIME_DIR}/lib/libxvidcore.a ${RUNTIME_DIR}/lib/libogg.a ${RUNTIME_DIR}/lib/libvorbis.a ${RUNTIME_DIR}/lib/libfdk-aac.a ${RUNTIME_DIR}/lib/libopus.a
 
 # Helper methods
 print_done = \
