@@ -1,7 +1,7 @@
 UNAME := $(shell uname -s)
 REV := $(shell git rev-list HEAD | wc -l | sed 's/ *//g')
 
-all: init bzip2 zlib yasm faac gsm lame ogg vorbis theora vpx amr x264 fdk_aac opus xvid ffmpeg segmenter message
+all: init bzip2 zlib yasm faac gsm lame ogg vorbis theora vpx amr x264 fdk_aac opus xvid ffmpeg segmenter libav message
 
 TTY_WHITE = \\033[1\;39m
 TTY_BLUE = \\033[1\;34m
@@ -93,19 +93,19 @@ FFMPEG_TOOL_URL = git://git.videolan.org/ffmpeg.git
 SEGMENTER_TOOL_URL = git://github.com/vivienschilis/segmenter.git
 SEGMENTER_TOOL = segmenter
 
-TOOLS_SOURCES = ${FFMPEG_TOOL_URL} ${SEGMENTER_TOOL_URL}
+AVCONV_TOOL = libav
+AVCONV_TOOL_URL = git://git.libav.org/libav.git
+
+TOOLS_SOURCES = ${FFMPEG_TOOL_URL} ${SEGMENTER_TOOL_URL} ${AVCONV_TOOL_URL}
 
 
 # FFMPEG FLAGS
 FFMPEG_CFLAGS=--static
 FFMPEG_LDFLAGS=
 
-FFMPEG_FEATURES += --enable-pthreads
-FFMPEG_FEATURES += --enable-runtime-cpudetect
-
 ENABLED_FFMPEG_CODECS += --enable-postproc
 ENABLED_FFMPEG_CODECS += --enable-nonfree
-ENABLED_FFMPEG_CODECS += --enable-libx264 
+ENABLED_FFMPEG_CODECS += --enable-libx264
 ENABLED_FFMPEG_CODECS += --enable-gpl
 ENABLED_FFMPEG_CODECS += --enable-libfaac
 ENABLED_FFMPEG_CODECS += --enable-libmp3lame
@@ -121,20 +121,41 @@ ENABLED_FFMPEG_CODECS += --enable-libfdk-aac
 ENABLED_FFMPEG_CODECS += --enable-version3
 ENABLED_FFMPEG_CODECS += --enable-libopus
 
-# ENABLED_FFMPEG_CODECS += --enable-libdirac
-# ENABLED_FFMPEG_CODECS += --enable-libvo-aacenc
-# ENABLED_FFMPEG_CODECS += --enable-libvo-amrwbenc
-
 DISABLED_FFMPEG_TOOLS += --disable-ffplay
 DISABLED_FFMPEG_TOOLS += --disable-ffserver
-#DISABLED_FFMPEG_TOOLS += --disable-ffprobe
 DISABLED_FFMPEG_TOOLS += --disable-network
 DISABLED_FFMPEG_TOOLS += --disable-devices
 DISABLED_FFMPEG_TOOLS += --disable-doc
 
 CONFIGURE_FFMPEG = ${CONFIGURE_STATIC} ${ENABLED_FFMPEG_CODECS} ${DISABLED_FFMPEG_TOOLS}  --cc=clang --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --bindir=${DIST_DIR}/bin --incdir=${DIST_DIR}/include --libdir=${DIST_DIR}/lib --prefix=${PREFIX_DIR}
 
-ALL_LIBS = ${FAAC_CODEC} ${GSM_CODEC} ${LAME_CODEC} ${OGG_CODEC} ${THEORA_CODEC} ${VORBIS_CODEC} ${VPX_CODEC} ${AMR_CODEC} ${X264_CODEC} ${XVID_CODEC} ${X264_CODEC} ${FFMPEG_TOOL} ${SEGMENTER_TOOL}
+
+AVCONV_CFLAGS=--static
+AVCONV_LDFLAGS=
+
+ENABLED_AVCONV_CODECS += --enable-nonfree
+ENABLED_AVCONV_CODECS += --enable-libx264
+ENABLED_AVCONV_CODECS += --enable-gpl
+ENABLED_AVCONV_CODECS += --enable-libfaac
+ENABLED_AVCONV_CODECS += --enable-libmp3lame
+ENABLED_AVCONV_CODECS += --enable-libtheora
+ENABLED_AVCONV_CODECS += --enable-libxvid
+ENABLED_AVCONV_CODECS += --enable-libvorbis
+ENABLED_AVCONV_CODECS += --enable-libgsm
+ENABLED_AVCONV_CODECS += --enable-libvpx
+ENABLED_AVCONV_CODECS += --enable-avfilter
+ENABLED_AVCONV_CODECS += --enable-libopencore-amrnb
+ENABLED_AVCONV_CODECS += --enable-libopencore-amrwb
+ENABLED_AVCONV_CODECS += --enable-libfdk-aac
+ENABLED_AVCONV_CODECS += --enable-version3
+ENABLED_AVCONV_CODECS += --enable-libopus
+
+DISABLED_AVCONV_TOOLS += --disable-avserver
+DISABLED_AVCONV_TOOLS += --disable-doc
+
+CONFIGURE_AVCONV = ${CONFIGURE_STATIC} ${ENABLED_AVCONV_CODECS} ${DISABLED_AVCONV_TOOLS} --cc=clang --extra-cflags="${FFMPEG_CFLAGS}"  --extra-ldflags="${FFMPEG_LDFLAGS}" --bindir=${DIST_DIR}/bin --incdir=${DIST_DIR}/include --libdir=${DIST_DIR}/lib --prefix=${PREFIX_DIR}
+
+ALL_LIBS = ${FAAC_CODEC} ${GSM_CODEC} ${LAME_CODEC} ${OGG_CODEC} ${THEORA_CODEC} ${VORBIS_CODEC} ${VPX_CODEC} ${AMR_CODEC} ${X264_CODEC} ${XVID_CODEC} ${X264_CODEC} ${FFMPEG_TOOL} ${SEGMENTER_TOOL} ${AVCONV_TOOL}
 
 UNAME := $(shell uname)
 
@@ -263,6 +284,11 @@ ffmpeg:
 	@$(call start_compiling_message,ffmpeg)
 	@cd ${SRC_DIR}/${FFMPEG_TOOL} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_FFMPEG}; else $(call prev_configured_message,ffmpeg); fi && $(call m_and_mi,ffmpeg);
 	@$(call end_compiling_message,ffmpeg)
+
+libav:
+	@$(call start_compiling_message, avconv)
+	@cd ${SRC_DIR}/${AVCONV_TOOL} && if [ ! -f 'configure.done'  ]; then ${CONFIGURE_AVCONV}; else $(call prev_configured_message,avconv); fi && $(call m_and_mi,avconv);
+	@$(call end_compiling_message,avconv)
 
 qtfs: 
 	@$(call start_compiling_message,qt-faststart)

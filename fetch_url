@@ -145,7 +145,7 @@ if [ "$UNPACK" -ne 0 ]; then
       sh tar xjvf "$cache_file"
     ;;
     git)
-      sh cp -r "$cache_file" .
+      sh cp -rf "$cache_file" .
       if [ -n "$GIT_COMMIT" ]; then
         sh pushd $filename
         sh git checkout $GIT_COMMIT
