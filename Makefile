@@ -76,11 +76,11 @@ OPUS_CODEC = opus-1.0.1
 X264_CODEC_URL = git://git.videolan.org/x264.git
 X264_CODEC = x264
 
-YASM_TOOL_URL = http://www.tortall.net/projects/yasm/releases/yasm-1.1.0.tar.gz
-YASM_TOOL = yasm-1.1.0
+YASM_TOOL_URL = http://www.tortall.net/projects/yasm/releases/yasm-1.2.0.tar.gz
+YASM_TOOL = yasm-1.2.0
 
-ZLIB_URL = http://zlib.net/zlib-1.2.7.tar.bz2
-ZLIB = zlib-1.2.7
+ZLIB_URL = http://zlib.net/zlib-1.2.8.tar.gz
+ZLIB = zlib-1.2.8
 
 BZIP2_URL = http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz
 BZIP2 = bzip2-1.0.6
