@@ -55,8 +55,8 @@ OGG_CODEC = libogg-1.2.0
 VORBIS_CODEC_URL = http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.1.tar.gz
 VORBIS_CODEC = libvorbis-1.3.1
 
-XVID_CODEC_URL = http://downloads.xvid.org/downloads/xvidcore-1.2.2.tar.gz
-XVID_CODEC = xvidcore/build/generic	
+XVID_CODEC_URL = http://downloads.xvid.org/downloads/xvidcore-1.3.2.tar.gz
+XVID_CODEC = xvidcore/build/generic
 
 AMR_CODEC_URL = http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/0.1.2/opencore-amr-0.1.2.tar.gz
 AMR_CODEC = opencore-amr-0.1.2
@@ -70,8 +70,8 @@ VPX_CODEC = libvpx
 FDK_AAC_CODEC_URL=http://downloads.sourceforge.net/opencore-amr/fdk-aac-0.1.0.tar.gz
 FDK_AAC_CODEC = fdk-aac-0.1.0
 
-OPUS_CODEC_URL=http://downloads.xiph.org/releases/opus/opus-1.0.1.tar.gz
-OPUS_CODEC = opus-1.0.1
+OPUS_CODEC_URL=http://downloads.xiph.org/releases/opus/opus-1.0.3.tar.gz
+OPUS_CODEC = opus-1.0.3
 
 X264_CODEC_URL = git://git.videolan.org/x264.git
 X264_CODEC = x264
